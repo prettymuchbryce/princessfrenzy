@@ -149,11 +149,7 @@ def handleLogin(ws,params,game)
 end
 
 def handleMove(user,ws,params,game)
-  if user==nil
-    return
-  end
-  
-  if(user.dead)
+  if user==nil || user.dead
     return
   end
   
@@ -206,7 +202,7 @@ def handleMove(user,ws,params,game)
 end
 
 def handleArrow(user,ws,params,game)
-  if user==nil
+  if user==nil || user.dead
     return
   end
 
@@ -323,13 +319,11 @@ EventMachine.run {
     EM.add_periodic_timer(0.05) do
       game.arrows.each do |arrow|
 
-
         game.users.each do |user|
           if arrow.level.collision[arrow.y][arrow.x] !=0
             arrow.x = -1
             arrow.y = -1
           end
-
           if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
             sendServerMessageMessage(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
@@ -352,7 +346,6 @@ EventMachine.run {
         arrow.level.users.each do |user|
           sendArrowMessage(game, user.ws, arrow)
         end
-
 		
 		# we move the arrows after checking collision
 		if arrow.x >= 0 && arrow.y >= 0 && arrow.x < Game::MAP_WIDTH && arrow.y < Game::MAP_HEIGHT
