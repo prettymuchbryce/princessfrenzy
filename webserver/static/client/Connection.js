@@ -83,7 +83,7 @@ Connection.onmessage = function (e) {
 				//Congrats you're winning.
 			}
 
-			if (params[1]==="null") {
+			if (params[1]==="_null") {
 				if (!muted) {
 					soundRound.play();
 				}

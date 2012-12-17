@@ -88,6 +88,14 @@ def addUserToLevel(game,user,level)
 end
 
 def removeUserFromGame(game,user)
+  #Is this user the current winner?
+  if user == game.current_winner
+    game.current_winner = nil
+	user.level.users.each do |u|
+      sendServerMessageMessage(game,u.ws,user.id + " gives up the princess. " + game.princess_time.to_s + " seconds left.")
+      sendWinningMessage(game,u.ws,"_null")
+    end
+  end
   removeUserFromLevel(game,user,user.level)
   game.users.delete(user)
 end
@@ -299,7 +307,7 @@ EventMachine.run {
 
         Level.levels["2.json"].users.each do |user|
           sendPrincessMessage(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"],Level.levels["2.json"].princess_dir)
-          sendWinningMessage(game,user.ws,"null")
+          sendWinningMessage(game,user.ws,"_null")
         end
 
         #Send leaderboard info
