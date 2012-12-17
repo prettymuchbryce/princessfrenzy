@@ -52,10 +52,18 @@ function loadLevel(path) {
 	$.ajax({
 	  url: "levels/"+path+"?r="+(new Date()).getTime()
 	}).done(function(payload) { 
+	  destroyArrows();
 	  destroyTileMap();
 	  parseLayers(payload.layers);
 	  startRender();
 	});
+}
+
+function destroyArrows() {
+	for(var i = 0; i < arrows.length; i++) {
+		arrows[i].destroy();
+		arrows.splice(i,1);
+	}
 }
 
 function getTileById(id) {
