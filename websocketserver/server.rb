@@ -230,7 +230,7 @@ def handleArrow(user,ws,params,game)
   else
     return
   end
-  arrow = Arrow.new(game.arrowIds.to_s, user.dir, x, y, user.level)
+  arrow = Arrow.new(game.arrowIds.to_s, user.dir, x, y, user.level, user.id)
   game.arrowIds+=1
   game.arrows.push(arrow)
 
@@ -328,7 +328,7 @@ EventMachine.run {
             arrow.x = -1
             arrow.y = -1
           end
-          if user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
+          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
             sendServerMessageMessage(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
