@@ -93,7 +93,7 @@ function parseLayers(layers) {
 	console.log("parse");
 	for (var i = 0; i < layers.length; i++) {
 		var layer = layers[i];
-		if (layer.name === "collision") {
+		if (layer.name === "collision" || layer.name === "playercollision") {
 			continue;
 		}
 		if (layer.type !== "tilelayer") {

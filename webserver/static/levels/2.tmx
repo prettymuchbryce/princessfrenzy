@@ -15,7 +15,12 @@
  </layer>
  <layer name="collision" width="25" height="20" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztkzsOACAIQ3tl7r+4GgOxFIwONmExxScfDYD9eDY6xDJ2/Gzu6mNqVPI9T0YKw3tvVMd8xjK8ezr6yMxO5TO7q86GqYG9r8I4+T8ibycj6wHyDDh5O6kMVewOV3p5gzEAtL+a8A==
+   eJzFlTEOACAIA/my/1/cjdDSYmzCROEwRI2IWEmwcuunlc2jxG/GhFgGmq3KMwzm/JWnw+hIYSjqMFAf5HPzDF/poexmUj/fpUzuLpg+tzt45rP6LoPxolrX54h9s1//HwpjA67YQjc=
+  </data>
+ </layer>
+ <layer name="playercollision" width="25" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJwrZGBgKBxmmJpg1I5RO/DZgUueFH341OKTJ1UvOeZQyw5KADF2UGIfseUJqeFISC894xwboHXaJRcMljRFS3toZQcAfideBg==
   </data>
  </layer>
  <objectgroup name="objects" width="25" height="20">

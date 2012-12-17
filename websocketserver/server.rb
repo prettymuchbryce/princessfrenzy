@@ -156,19 +156,32 @@ def handleMove(user,ws,params,game)
   if(user.dead)
     return
   end
-
-  if params[1].to_s == Game::DIRECTION_UP.to_s && user.y > 0 && user.level.collision[user.y-1][user.x] == 0
-    user.y-=1
-    user.dir = Game::DIRECTION_UP
-  elsif params[1].to_s == Game::DIRECTION_DOWN.to_s && user.y < Game::MAP_HEIGHT-1 && user.level.collision[user.y+1][user.x] == 0
-    user.y+=1
-    user.dir = Game::DIRECTION_DOWN
-  elsif params[1].to_s == Game::DIRECTION_LEFT.to_s && user.x > 0 && user.level.collision[user.y][user.x-1] == 0
-    user.x-=1
-    user.dir = Game::DIRECTION_LEFT
-  elsif params[1].to_s == Game::DIRECTION_RIGHT.to_s && user.x < Game::MAP_WIDTH-1 && user.level.collision[user.y][user.x+1] == 0
-    user.x+=1
-    user.dir = Game::DIRECTION_RIGHT
+  
+  dir = user.dir
+  x = user.x
+  y = user.y
+  
+  # where do they want to go?
+  user.dir = params[1].to_s
+  
+  if params[1].to_s == Game::DIRECTION_UP.to_s
+	y -= 1
+  elsif params[1].to_s == Game::DIRECTION_DOWN.to_s
+    y += 1
+  elsif params[1].to_s == Game::DIRECTION_LEFT.to_s
+    x -= 1
+  elsif params[1].to_s == Game::DIRECTION_RIGHT.to_s
+    x += 1
+  else
+    # this is an invalid direction....
+    user.dir = dir
+  end
+  
+  # now lets make sure they can actually move there
+  puts user.id + " trying to move to " + x.to_s + ", " + y.to_s + "; collision is " + user.level.collision[y][x].to_s + ", " + user.level.collision[y][x].to_s
+  if x >= 0 && x < Game::MAP_WIDTH && y >= 0 && y < Game::MAP_HEIGHT && user.level.collision[y][x] == 0 && user.level.playercollision[y][x] == 0
+    user.x = x
+	user.y = y
   end
 
   user.level.warps.each do |warp|
@@ -310,15 +323,6 @@ EventMachine.run {
     end
     EM.add_periodic_timer(0.05) do
       game.arrows.each do |arrow|
-        if arrow.dir.to_s == Game::DIRECTION_UP.to_s
-          arrow.y-=1
-        elsif arrow.dir.to_s == Game::DIRECTION_DOWN.to_s
-          arrow.y+=1
-        elsif arrow.dir.to_s == Game::DIRECTION_LEFT.to_s
-          arrow.x-=1
-        elsif arrow.dir.to_s == Game::DIRECTION_RIGHT.to_s
-          arrow.x+=1
-        end
 
         game.users.each do |user|
           if arrow.level.collision[arrow.y][arrow.x] !=0
@@ -347,8 +351,19 @@ EventMachine.run {
         arrow.level.users.each do |user|
           sendArrowMessage(game, user.ws, arrow)
         end
-
-        if arrow.x < 0 || arrow.y < 0 || arrow.x == Game::MAP_WIDTH || arrow.y == Game::MAP_HEIGHT
+		
+		# we move the arrows after checking collision
+		if arrow.x >= 0 && arrow.y >= 0 && arrow.x < Game::MAP_WIDTH && arrow.y < Game::MAP_HEIGHT
+			if arrow.dir.to_s == Game::DIRECTION_UP.to_s
+				arrow.y-=1
+			elsif arrow.dir.to_s == Game::DIRECTION_DOWN.to_s
+				arrow.y+=1
+			elsif arrow.dir.to_s == Game::DIRECTION_LEFT.to_s
+				arrow.x-=1
+			elsif arrow.dir.to_s == Game::DIRECTION_RIGHT.to_s
+				arrow.x+=1
+			end
+		else
           game.arrows.delete(arrow)
         end
 
