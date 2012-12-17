@@ -344,7 +344,7 @@ EventMachine.run {
             arrow.x = -1
             arrow.y = -1
           end
-          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level && user.spawnProtection > Time.now
+          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level && user.spawnProtection <= Time.now
             sendServerMessageMessage(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
