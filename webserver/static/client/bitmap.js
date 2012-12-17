@@ -130,6 +130,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 				rect.width += rect.x;
 				rect.x = 0;
 			}
+			
 			if(rect.y < 0) {
 				rect.height += rect.y;
 				rect.y = 0;
