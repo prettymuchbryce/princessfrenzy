@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="25" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
+  <image source="../assets/tiles.png" width="512" height="512"/>
+ </tileset>
+ <layer name="ground" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJytVdsNxCAMo5X6yUg3FiMwVLsBX13pVIlIlutA0N2HBSIPh5hHSSkVgUpY9VG2X3LyuuKzsQ2wO6MHr5bHdv8BTeRGjuzgI+D5tvTWQHE8861j78D8tmY+HOtpbn4Wxz1ADrZZjOJA/Y3D4kb9YhvGtPSunzkuiEU75ixi/UpvPWaa8/3APipbRPNKexjlUbarQ+mBc3UWN2d9dnY93bHOSD7FP3pbqqN1pFclwBHVnG0Wfw40Rz2M4wTgfvCeMfcqRxZxM6AvnyN+d1fOjwf173AvRshBP++fm/0LR+c4Ar5Y/xfLwb4/
+  </data>
+ </layer>
+ <layer name="detail" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFlII+NBqXGD5xckEPlcwZBaNgFIyCUTB4wEUy9AAA+gwEsg==
+  </data>
+ </layer>
+ <layer name="collision" width="25" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztkzsOACAIQ3tl7r+4GgOxFIwONmExxScfDYD9eDY6xDJ2/Gzu6mNqVPI9T0YKw3tvVMd8xjK8ezr6yMxO5TO7q86GqYG9r8I4+T8ibycj6wHyDDh5O6kMVewOV3p5gzEAtL+a8A==
+  </data>
+ </layer>
+ <objectgroup name="objects" width="25" height="20">
+  <object type="WARP" x="388" y="619" width="23" height="17">
+   <properties>
+    <property name="target" value="1.json"/>
+   </properties>
+  </object>
+  <object type="SPAWN" x="389" y="580" width="21" height="21"/>
+  <object x="-76" y="-112"/>
+ </objectgroup>
+</map>

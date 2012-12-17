@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="25" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
+  <image source="../assets/tiles.png" width="512" height="512"/>
+ </tileset>
+ <layer name="ground" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzdk8ENgCAMRVnAcTuCQyksQGJ0JSXh0Py0tKAe9PBCovU/aPEIIRyM6SY75En8xbHU2tG1ODID8z17sCgZifGWY+R9vFiBqNSPOkpfNyB/0BFhjqmzV3OF6np3vqTAHeikhoPXkpLhodRq/7SUT0p+y+11SOfHZ1jPV80h7VHz4vnQbzmk/rTyR3pl5T/lsGZqzd57rySf5w733F3t+xOeHwh0
+  </data>
+ </layer>
+ <layer name="detail" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFAwkuDrQDRsEoGCAASvt3BtoRo2AUDCMAAMAKAn8=
+  </data>
+ </layer>
+ <layer name="collision" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJx7yMDA8HAUk4wZkGgGHHL49DIQUI8NEJJHdxM+eUJmUMMOQoBQ+FADYDNvqNpBj7CipR248hA17aEk3Y7aMWrHULcDAC7+g9c=
+  </data>
+ </layer>
+ <objectgroup name="objects" width="25" height="20">
+  <object type="WARP" x="388" y="357" width="22" height="25">
+   <properties>
+    <property name="target" value="2.json"/>
+   </properties>
+  </object>
+  <object type="SPAWN" x="392" y="389" width="19" height="20"/>
+ </objectgroup>
+</map>
