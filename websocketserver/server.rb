@@ -41,8 +41,8 @@ def sendLevelMessage(game,ws,file)
   ws.send message
 end
 
-def sendPrincessMessage(game,ws,x,y)
-  message = Game::PRINCESS + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s
+def sendPrincessMessage(game,ws,x,y,dir)
+  message = Game::PRINCESS + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s + Game::DELIMITER + dir.to_s
   ws.send message
 end
 
@@ -72,7 +72,7 @@ def addUserToLevel(game,user,level)
     end
 
     if level.file == "2.json"
-      sendPrincessMessage(game,user.ws,level.princess_point["x"],level.princess_point["y"])
+      sendPrincessMessage(game,user.ws,level.princess_point["x"],level.princess_point["y"],level.princess_dir)
     end
 
     level.users.push(user)
@@ -96,7 +96,7 @@ def removeUserFromLevel(game,user,level)
   level.users.delete(user)
 
   if level.file == "2.json"
-    sendPrincessMessage(game,user.ws,-1,-1)
+    sendPrincessMessage(game,user.ws,-1,-1,Game::DIRECTION_RIGHT)
   end
 
   user.x = -1
@@ -157,7 +157,7 @@ def handleMove(user,ws,params,game)
 	return
   end
   
-  user.nextMove = Time.now + Game::PLAYER_ARROW_TIME
+  user.nextMove = Time.now + Game::PLAYER_MOVE_TIME
   
   dir = user.dir
   x = user.x
@@ -251,7 +251,7 @@ def parseMessage(ws,msg,game)
   params = msg.split(Game::DELIMITER)
 
 	if msg[0] == Game::LOGIN
-    handleLogin(ws,params,game)
+		handleLogin(ws,params,game)
     return
   end
 
@@ -298,7 +298,7 @@ EventMachine.run {
         Level.levels["2.json"].randomizePrincess
 
         Level.levels["2.json"].users.each do |user|
-          sendPrincessMessage(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"])
+          sendPrincessMessage(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"],Level.levels["2.json"].princess_dir)
           sendWinningMessage(game,user.ws,"null")
         end
 

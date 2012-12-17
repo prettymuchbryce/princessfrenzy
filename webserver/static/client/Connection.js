@@ -74,9 +74,9 @@ Connection.onmessage = function (e) {
 			triggerAdminMessage(params[1]);
 		} else if (params[0] === "P") {
 			if (princess == null) {
-				princess = new Princess(params[1],params[2]);
+				princess = new Princess(params[1],params[2],params[3]);
 			} else {
-				princess.move(params[1],params[2]);
+				princess.move(params[1],params[2],params[3]);
 			}
 		} else if (params[0] === "W") {
 			if (params[1] === id) {
