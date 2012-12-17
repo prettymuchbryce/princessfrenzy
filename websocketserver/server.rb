@@ -152,6 +152,10 @@ def handleMove(user,ws,params,game)
   if user==nil
     return
   end
+  
+  if(user.dead)
+    return
+  end
 
   if params[1].to_s == Game::DIRECTION_UP.to_s && user.y > 0 && user.level.collision[user.y-1][user.x] == 0
     user.y-=1

@@ -10,7 +10,7 @@ var Player = function(id,dir,x,y) {
 	var chatField = new createjs.Text()
 
 	this.bitmap = new createjs.Bitmap(ASSET_PLAYER);
-	this.bitmap.sourceRect = {x: 0, y:0, width: TILE_SIZE, height: TILE_SIZE};
+	this.bitmap.sourceRect = {x: 0, y: 0, width: TILE_SIZE, height: TILE_SIZE};
 	this.asset.addChild(this.bitmap);
 
 	objectLayer.addChild(this.asset);
