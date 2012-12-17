@@ -26,7 +26,7 @@ def sendServerMessageMessage(game,ws,message)
 end
 
 def sendArrowMessage(game,ws,arrow)
-  message = Game::ARROW + Game::DELIMITER + arrow.id + Game::DELIMITER + arrow.dir.to_s + Game::DELIMITER + arrow.x.to_s + Game::DELIMITER + arrow.y.to_s
+  message = Game::ARROW + Game::DELIMITER + arrow.id + Game::DELIMITER + arrow.dir.to_s + Game::DELIMITER + arrow.x.to_s + Game::DELIMITER + arrow.y.to_s + Game::DELIMITER + arrow.level.file
   ws.send message
 end
 
@@ -205,6 +205,12 @@ def handleArrow(user,ws,params,game)
   if user==nil || user.dead
     return
   end
+  
+  if Time.now < user.nextArrow - Game::PLAYER_FUDGE_ACTION_TIME
+	return
+  end
+  
+  user.nextArrow = Time.now + Game::PLAYER_ARROW_TIME
 
   #if user.level == game.levels[0][0]
   #  sendServerMessageMessage(game,ws,"You cannot fire arrows here.")
@@ -256,7 +262,7 @@ def parseMessage(ws,msg,game)
 
   user.last_action = Time.now
 
-	if msg[0] == Game::MOVE
+  if msg[0] == Game::MOVE
     handleMove(user,ws,params,game)
   elsif msg[0] == Game::ARROW
     handleArrow(user,ws,params,game)
@@ -324,7 +330,7 @@ EventMachine.run {
             arrow.x = -1
             arrow.y = -1
           end
-          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
+          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level && user.spawnProtection > Time.now
             sendServerMessageMessage(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
@@ -336,6 +342,7 @@ EventMachine.run {
               timer = EventMachine::Timer.new(20) do
                 if user!=nil
                   user.dead = false
+				  user.spawnProtection = Time.now + 1
                 end
               end
               sendDieMessage(game, ws, user)

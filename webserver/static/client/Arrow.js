@@ -1,15 +1,16 @@
 //Main Classes
-var Arrow = function(id,direction,x,y) {
+var Arrow = function(id,direction,x,y,level) {
 	this.id = id;
 	this.x = x;
 	this.y = y;
 	this.direction = direction;
+	this.level = level;
 	this.asset = new createjs.Bitmap(ASSET_ARROW);
 	this.asset.sourceRect = {x: 0, y:0, width: TILE_SIZE, height:TILE_SIZE};
 	stage.addChild(this.asset);
 	this.asset.x = this.x*TILE_SIZE;
 	this.asset.y = this.y*TILE_SIZE;
-
+	
 	this.updateVisualPosition = function() {
 		//createjs.Tween.get(this.asset)
 		//.to({x:this.x*TILE_SIZE}, 10, createjs.Ease.linear)
