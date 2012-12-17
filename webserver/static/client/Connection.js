@@ -177,4 +177,3 @@ function login(username) {
 
 	Connection.send("L" + DELIMITER + username);
 }
-

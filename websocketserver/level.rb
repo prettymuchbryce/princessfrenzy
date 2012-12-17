@@ -2,7 +2,7 @@ require 'json'
 require_relative 'warp'
 require_relative 'game'
 class Level
-    attr_accessor :users, :arrows, :collision, :warps, :spawn, :file, :princess_point, :has_princess
+    attr_accessor :users, :arrows, :collision, :playercollision, :warps, :spawn, :file, :princess_point, :has_princess
     @levels = Hash.new
     class << self
         attr_accessor :levels
@@ -17,6 +17,7 @@ class Level
         @spawn = {}
         rows, cols = Game::MAP_WIDTH,Game::MAP_HEIGHT
         @collision = Array.new(rows) { Array.new(cols) }
+		@playercollision = Array.new(rows) { Array.new(cols) }
         @warps = []
         level = JSON.parse(File.read('../webserver/static/levels/'+file))
 
@@ -28,15 +29,25 @@ class Level
                 x = 0
                 y = 0
                 layer["data"].each do |tile|
-                    collision[y][x] = tile
+                    @collision[y][x] = tile
                     x+=1
                     if x == Game::MAP_WIDTH
                         x = 0
                         y +=1
                     end
                 end
-            end
-            if layer["name"] == "objects"
+			elsif layer["name"] == "playercollision"
+				x = 0
+				y = 0
+				layer["data"].each do |tile|
+					@playercollision[y][x] = tile
+					x+=1
+					if x == Game::MAP_WIDTH
+						x = 0
+						y +=1
+					end
+				end
+            elsif layer["name"] == "objects"
                 layer["objects"].each do |object|
                     if object["type"] == "WARP"
                         if !Level.levels[object["properties"]["target"]]
@@ -64,7 +75,7 @@ class Level
         candidates = []
         for y in 0..Game::MAP_HEIGHT
             for x in 0..Game::MAP_WIDTH
-                if @collision[y][x] == 0
+                if @collision[y][x] == 0 && @playercollision[y][x] == 0
                     p = {}
                     p["x"] = x
                     p["y"] = y
