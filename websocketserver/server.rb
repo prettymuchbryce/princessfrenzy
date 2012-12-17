@@ -178,7 +178,6 @@ def handleMove(user,ws,params,game)
   end
   
   # now lets make sure they can actually move there
-  puts user.id + " trying to move to " + x.to_s + ", " + y.to_s + "; collision is " + user.level.collision[y][x].to_s + ", " + user.level.collision[y][x].to_s
   if x >= 0 && x < Game::MAP_WIDTH && y >= 0 && y < Game::MAP_HEIGHT && user.level.collision[y][x] == 0 && user.level.playercollision[y][x] == 0
     user.x = x
 	user.y = y
