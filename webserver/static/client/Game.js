@@ -23,6 +23,7 @@ var server_texts = [];
 var princess = null;
 var princessName = "Princess";
 var muted = false;
+var levelPath = "";
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
@@ -48,10 +49,12 @@ function stopRender() {
 }
 
 function loadLevel(path) {
+	// change the current level
+	levelPath = path;
 	stopRender();
 	$.ajax({
 	  url: "levels/"+path+"?r="+(new Date()).getTime()
-	}).done(function(payload) { 
+	}).done(function(payload) {
 	  destroyArrows();
 	  destroyTileMap();
 	  parseLayers(payload.layers);
@@ -62,8 +65,9 @@ function loadLevel(path) {
 function destroyArrows() {
 	for(var i = 0; i < arrows.length; i++) {
 		arrows[i].destroy();
-		arrows.splice(i,1);
 	}
+	
+	arrows.length = 0;
 }
 
 function getTileById(id) {
@@ -185,8 +189,8 @@ function createPlayer(id,dir, x,y) {
 	return p;
 }
 
-function createArrow(id,dir,x,y) {
-	a = new Arrow(id,dir,x,y);
+function createArrow(id,dir,x,y,level) {
+	a = new Arrow(id,dir,x,y,level);
 	arrows.push(a);
 }
 
@@ -202,8 +206,13 @@ function onTick() {
 	if (dead === true) {
 		return;
 	}
-	moveCounter++;
-	arrowCounter++;
+	
+	// We dont want to overflow these, so lets stop once they reach the limit
+	if(moveCounter <= moveTime)
+		moveCounter++;
+	if(arrowCounter <= arrowTime)
+		arrowCounter++;
+		
 	if (moveCounter > moveTime) {
 		if (Keyboard.isKeyDown(Keyboard.DOWN)) {
 			sendMoveUpdate(DIRECTION_DOWN);
@@ -219,6 +228,7 @@ function onTick() {
 			moveCounter = 0;
 		}
 	}
+	
 	if (arrowCounter > arrowTime) {
 		if (Keyboard.isKeyDown(Keyboard.A)) {
 			sendShootArrow();
