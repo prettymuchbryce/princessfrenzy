@@ -153,6 +153,12 @@ def handleMove(user,ws,params,game)
     return
   end
   
+  if Time.now < user.nextMove - Game::PLAYER_FUDGE_ACTION_TIME
+	return
+  end
+  
+  user.nextMove = Time.now + Game::PLAYER_ARROW_TIME
+  
   dir = user.dir
   x = user.x
   y = user.y
