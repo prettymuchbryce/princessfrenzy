@@ -14,10 +14,10 @@ namespace :deploy do
 		run "killall ruby"
 	end
 	task :restart, :roles => :web do
-		run "ruby /home/ubuntu/server/current/webserver/webserver.rb"
+		run "sudo ruby /home/ubuntu/server/current/webserver/webserver.rb"
 	end
 	task :restart, :roles => :app do
-		run "/bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
+		run "sudo /bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
 	end
 end
 
