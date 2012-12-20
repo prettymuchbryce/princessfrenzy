@@ -11,14 +11,16 @@ set :deploy_to, "/home/ubuntu/server"
 
 namespace :deploy do
 	task :restart do
-		run "killall ruby"
-	end
-	task :restart, :roles => :web do
+		run "sudo killall ruby"
 		run "sudo ruby /home/ubuntu/server/current/webserver/webserver.rb"
-	end
-	task :restart, :roles => :app do
 		run "sudo /bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
 	end
+	#task :restart, :roles => :web do
+	#	run "sudo ruby /home/ubuntu/server/current/webserver/webserver.rb"
+	#end
+	#task :restart, :roles => :app do
+	#	run "sudo /bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
+	e#nd
 end
 
 # set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
