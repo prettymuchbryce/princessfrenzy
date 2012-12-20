@@ -20,7 +20,7 @@ namespace :deploy do
 	#end
 	#task :restart, :roles => :app do
 	#	run "sudo /bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
-	e#nd
+	#end
 end
 
 # set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
