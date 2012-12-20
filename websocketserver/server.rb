@@ -5,137 +5,137 @@ require_relative 'arrow.rb'
 require_relative 'user.rb'
 require_relative 'helpers.rb'
 
-def sendMoveMessage(game,ws,user)
+def send_move_message(game,ws,user)
   message = Game::MOVE + Game::DELIMITER + user.id + Game::DELIMITER + user.dir.to_s + Game::DELIMITER + user.x.to_s + Game::DELIMITER + user.y.to_s + Game::DELIMITER + user.dead.to_s
   ws.send message
 end
 
-def sendSpecificMoveMessage(game,ws,user,x,y)
+def send_specific_move_message(game,ws,user,x,y)
   message = Game::MOVE + Game::DELIMITER + user.id + Game::DELIMITER + user.dir.to_s + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s + Game::DELIMITER + user.dead.to_s
   ws.send message
 end
 
-def sendWinningMessage(game,ws,userId)
+def send_winning_message(game,ws,userId)
   message = Game::WINNING + Game::DELIMITER + userId
   ws.send message
 end
 
-def sendServerMessageMessage(game,ws,message)
+def send_server_message_message(game,ws,message)
   message = Game::SERVER_MESSAGE + Game::DELIMITER + message
   ws.send message
 end
 
-def sendArrowMessage(game,ws,arrow)
+def send_arrow_message(game,ws,arrow)
   message = Game::ARROW + Game::DELIMITER + arrow.id + Game::DELIMITER + arrow.dir.to_s + Game::DELIMITER + arrow.x.to_s + Game::DELIMITER + arrow.y.to_s + Game::DELIMITER + arrow.level.file
   ws.send message
 end
 
 
-def sendLeaderboardMessage(game,ws,html)
+def send_leaderboard_message(game,ws,html)
   message = Game::LEADERBOARD + Game::DELIMITER + html
   ws.send message
 end
 
-def sendLevelMessage(game,ws,file)
+def send_level_message(game,ws,file)
   message = Game::LEVEL + Game::DELIMITER + file
   ws.send message
 end
 
-def sendPrincessMessage(game,ws,x,y,dir)
+def send_princess_message(game,ws,x,y,dir)
   message = Game::PRINCESS + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s + Game::DELIMITER + dir.to_s
   ws.send message
 end
 
-def sendDieMessage(game,ws,user)
+def send_die_message(game,ws,user)
   message = Game::DIE + Game::DELIMITER + user.id
   ws.send message
 end
 
-def sendBannedMessage(game,ws)
+def send_banned_message(game,ws)
   message = Game::BANNED
   ws.send message
 end
 
-def sendChatMessage(game,ws,sender,message)
+def send_chat_message(game,ws,sender,message)
   message = Game::CHAT + Game::DELIMITER + sender + Game::DELIMITER + message.to_s
   ws.send message
 end
 
-def addUserToLevel(game,user,level)
-    sendLevelMessage(game, user.ws, level.file)
+def add_user_to_level(game,user,level)
+    send_level_message(game, user.ws, level.file)
 
     user.x = level.spawn["x"]
     user.y = level.spawn["y"]
 
-    level.users.each do |personAlreadyInLevel|
-      sendMoveMessage(game,user.ws,personAlreadyInLevel) #Tell this person about all the players
+    level.users.each do |user_already_in_level|
+      send_move_message(game,user.ws,user_already_in_level) #Tell this person about all the players
     end
 
     if level.file == "2.json"
-      sendPrincessMessage(game,user.ws,level.princess_point["x"],level.princess_point["y"],level.princess_dir)
+      send_princess_message(game,user.ws,level.princess_point["x"],level.princess_point["y"],level.princess_dir)
     end
 
     level.users.push(user)
     user.level = level
 
-    level.users.each do |personAlreadyInLevel|
-      sendMoveMessage(game,personAlreadyInLevel.ws,user) #Tell each player about this new person
+    level.users.each do |user_already_in_level|
+      send_move_message(game,user_already_in_level.ws,user) #Tell each player about this new person
     end
 
     level.arrows.each do |arrow|
-      sendArrowMessage(game, user.ws, arrow)
+      send_arrow_message(game, user.ws, arrow)
     end
 end
 
-def removeUserFromGame(game,user)
+def remove_user_from_game(game,user)
   #Is this user the current winner?
   if user == game.current_winner
     game.current_winner = nil
 	user.level.users.each do |u|
-      sendServerMessageMessage(game,u.ws,user.id + " gives up the princess. " + game.princess_time.to_s + " seconds left.")
-      sendWinningMessage(game,u.ws,"_null")
+      send_server_message_message(game,u.ws,user.id + " gives up the princess. " + game.princess_time.to_s + " seconds left.")
+      send_winning_message(game,u.ws,"_null")
     end
   end
-  removeUserFromLevel(game,user,user.level)
+  remove_user_from_level(game,user,user.level)
   game.users.delete(user)
 end
 
-def removeUserFromLevel(game,user,level)
+def remove_user_from_level(game,user,level)
   level.users.delete(user)
 
   if level.file == "2.json"
-    sendPrincessMessage(game,user.ws,-1,-1,Game::DIRECTION_RIGHT)
+    send_princess_message(game,user.ws,-1,-1,Game::DIRECTION_RIGHT)
   end
 
   user.x = -1
   user.y = -1
   
   #Tell all users that this guy is out of here..
-  level.users.each do |personAlreadyInLevel|
-    sendMoveMessage(game,personAlreadyInLevel.ws,user)
+  level.users.each do |user_already_in_level|
+    send_move_message(game,user_already_in_level.ws,user)
   end
 
   #Tell this users to delete display objects of old users
-   level.users.each do |personAlreadyInLevel|
-    sendSpecificMoveMessage(game,user.ws,personAlreadyInLevel,-1,-1)
+   level.users.each do |user_already_in_level|
+    send_specific_move_message(game,user.ws,user_already_in_level,-1,-1)
   end
 end
 
-def handleChat(user,ws,params,game)
+def handle_chat(user,ws,params,game)
   if user.id == nil || user == nil || params[1] == nil
     return
   end
   puts user.id.to_s + " : " + params[1]
   game.sockets.each do |ws|
-    sendChatMessage(game,ws,user.id.to_s,params[1])
+    send_chat_message(game,ws,user.id.to_s,params[1])
   end
 end
 
-def handleLogin(ws,params,game)
+def handle_login(ws,params,game)
   if params[1] == nil || params[1] == ""
     return
   end
-  if !doesUserExist(params[1],game)
+  if !does_user_exist?(params[1],game)
     ws.send Game::OK_RESPONSE
 
     port, ip = Socket.unpack_sockaddr_in(ws.get_peername)
@@ -147,25 +147,25 @@ def handleLogin(ws,params,game)
     end
 
     if game.current_winner != nil
-      sendWinningMessage(game,user.ws,game.current_winner.id)
+      send_winning_message(game,user.ws,game.current_winner.id)
     end
 
     game.users.push(user)
 
-    addUserToLevel(game,user,game.levels[0][0])
+    add_user_to_level(game,user,game.levels[0][0])
   end
 end
 
-def handleMove(user,ws,params,game)
+def handle_move(user,ws,params,game)
   if user==nil || user.dead
     return
   end
   
-  if Time.now < user.nextMove - Game::PLAYER_FUDGE_ACTION_TIME
+  if Time.now < user.next_move - Game::PLAYER_FUDGE_ACTION_TIME
 	return
   end
   
-  user.nextMove = Time.now + Game::PLAYER_MOVE_TIME
+  user.next_move = Time.now + Game::PLAYER_MOVE_TIME
   
   dir = user.dir
   x = user.x
@@ -188,15 +188,15 @@ def handleMove(user,ws,params,game)
   end
   
   # now lets make sure they can actually move there
-  if x >= 0 && x < Game::MAP_WIDTH && y >= 0 && y < Game::MAP_HEIGHT && user.level.collision[y][x] == 0 && user.level.playercollision[y][x] == 0
+  if x >= 0 && x < Game::MAP_WIDTH && y >= 0 && y < Game::MAP_HEIGHT && user.level.collision[y][x] == 0 && user.level.player_collision[y][x] == 0
     user.x = x
 	user.y = y
   end
 
   user.level.warps.each do |warp|
     if warp.x == user.x && warp.y == user.y
-        removeUserFromLevel(game,user,user.level)
-        addUserToLevel(game,user,warp.level)
+        remove_user_from_level(game,user,user.level)
+        add_user_to_level(game,user,warp.level)
     end
   end
 
@@ -204,27 +204,27 @@ def handleMove(user,ws,params,game)
     if user.x == Level.levels["2.json"].princess_point["x"] && user.y == Level.levels["2.json"].princess_point["y"] && game.current_winner != user
       game.current_winner = user
       user.level.users.each do |u|
-        sendServerMessageMessage(game,u.ws,user.id + " claims the princess. " + game.princess_time.to_s + " seconds left.")
-        sendWinningMessage(game,u.ws,user.id)
+        send_server_message_message(game,u.ws,user.id + " claims the princess. " + game.princess_time.to_s + " seconds left.")
+        send_winning_message(game,u.ws,user.id)
       end
     end
   end
 
-  user.level.users.each do |userInLevel|
-    sendMoveMessage(game,userInLevel.ws,user)
+  user.level.users.each do |user_in_level|
+    send_move_message(game,user_in_level.ws,user)
   end
 end
 
-def handleArrow(user,ws,params,game)
+def handle_arrow(user,ws,params,game)
   if user==nil || user.dead
     return
   end
   
-  if Time.now < user.nextArrow - Game::PLAYER_FUDGE_ACTION_TIME
+  if Time.now < user.next_arrow - Game::PLAYER_FUDGE_ACTION_TIME
 	return
   end
   
-  user.nextArrow = Time.now + Game::PLAYER_ARROW_TIME
+  user.next_arrow = Time.now + Game::PLAYER_ARROW_TIME
 
   #if user.level == game.levels[0][0]
   #  sendServerMessageMessage(game,ws,"You cannot fire arrows here.")
@@ -246,42 +246,42 @@ def handleArrow(user,ws,params,game)
   else
     return
   end
-  arrow = Arrow.new(game.arrowIds.to_s, user.dir, x, y, user.level, user.id)
-  game.arrowIds+=1
+  arrow = Arrow.new(game.arrow_ids.to_s, user.dir, x, y, user.level, user.id)
+  game.arrow_ids+=1
   game.arrows.push(arrow)
 
   arrow.level.users.each do |user|
-    sendArrowMessage(game, user.ws, arrow)
+    send_arrow_message(game, user.ws, arrow)
   end
 end
 
-def parseMessage(ws,msg,game)
+def parse_message(ws,msg,game)
   params = msg.split(Game::DELIMITER)
 
 	if msg[0] == Game::LOGIN
-		handleLogin(ws,params,game)
+    handle_login(ws,params,game)
     return
   end
 
-  user = getUserFromWs(game,ws)
+  user = get_user_from_ws(game,ws)
 
   if user == nil
     return
   end
 
-  if isUserBanned(game,user)
-    sendBannedMessage(game, ws)
+  if is_user_banned?(game,user)
+    send_banned_message(game, ws)
     return
   end
 
   user.last_action = Time.now
 
-  if msg[0] == Game::MOVE
-    handleMove(user,ws,params,game)
+	if msg[0] == Game::MOVE
+    handle_move(user,ws,params,game)
   elsif msg[0] == Game::ARROW
-    handleArrow(user,ws,params,game)
+    handle_arrow(user,ws,params,game)
   elsif msg[0] == Game::CHAT
-    handleChat(user,ws,params,game)
+    handle_chat(user,ws,params,game)
   elsif msg[0] == "V"
     #die("Goodbye")
   end
@@ -297,17 +297,17 @@ EventMachine.run {
           game.current_winner.wins+=1
 
           game.users.each do |user|
-            sendServerMessageMessage(game,user.ws,game.current_winner.id.to_s + " held onto the princess, and wins the round.")
+            send_server_message_message(game,user.ws,game.current_winner.id.to_s + " held onto the princess, and wins the round.")
           end
         
           game.current_winner = nil
         end
         game.princess_time = 60
-        Level.levels["2.json"].randomizePrincess
+        Level.levels["2.json"].randomize_princess
 
         Level.levels["2.json"].users.each do |user|
-          sendPrincessMessage(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"],Level.levels["2.json"].princess_dir)
-          sendWinningMessage(game,user.ws,"_null")
+          send_princess_message(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"],Level.levels["2.json"].princess_dir)
+          send_winning_message(game,user.ws,"_null")
         end
 
         #Send leaderboard info
@@ -321,7 +321,7 @@ EventMachine.run {
         end
 
         game.users.each do |user|
-          sendLeaderboardMessage(game,user.ws,html)
+          send_leaderboard_message(game,user.ws,html)
         end
 
       end
@@ -344,8 +344,9 @@ EventMachine.run {
             arrow.x = -1
             arrow.y = -1
           end
-          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level && user.spawnProtection <= Time.now
-            sendServerMessageMessage(game, user.ws, "You will be revived in 20 seconds.")
+
+          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
+            send_server_message_message(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
 
@@ -356,17 +357,18 @@ EventMachine.run {
               timer = EventMachine::Timer.new(20) do
                 if user!=nil
                   user.dead = false
-				  user.spawnProtection = Time.now + 1
+				  user.spawn_protection = Time.now + 1
                 end
               end
-              sendDieMessage(game, ws, user)
+              send_die_message(game, ws, user)
             end
           end
         end
 
         arrow.level.users.each do |user|
-          sendArrowMessage(game, user.ws, arrow)
+          send_arrow_message(game, user.ws, arrow)
         end
+
 		
 		# we move the arrows after checking collision
 		if arrow.x >= 0 && arrow.y >= 0 && arrow.x < Game::MAP_WIDTH && arrow.y < Game::MAP_HEIGHT
@@ -398,7 +400,7 @@ EventMachine.run {
           game.users.each do |user|
             if user.ws == ws
               id = user.id
-              removeUserFromGame(game,user)
+              remove_user_from_game(game,user)
             end
           end
 
@@ -407,13 +409,13 @@ EventMachine.run {
 
           #Inform players he left
           game.sockets.each do |socket|
-            sendChatMessage(game, socket, "THE SERVER SAYS", id.to_s + " has left.")
+            send_chat_message(game, socket, "THE SERVER SAYS", id.to_s + " has left.")
             socket.send Game::QUIT + Game::DELIMITER + id
           end
         }
 
         ws.onmessage { |msg|
-        	parseMessage(ws,msg,game)
+        	parse_message(ws,msg,game)
         }
     end
 }

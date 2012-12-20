@@ -1,4 +1,4 @@
-def getUserFromWs(game,ws)
+def get_user_from_ws(game,ws)
   game.users.each do |user|
     if user.ws == ws
       return user
@@ -7,7 +7,7 @@ def getUserFromWs(game,ws)
   return nil
 end
 
-def doesUserExist(id,game)
+def does_user_exist?(id,game)
   game.users.each do |user|
     if user.id == id
       return true
@@ -16,7 +16,7 @@ def doesUserExist(id,game)
   return false
 end
 
-def isUserBanned(game,user)
+def is_user_banned?(game,user)
   game.banned.each do |ip|
     if user.ip == ip
       return true

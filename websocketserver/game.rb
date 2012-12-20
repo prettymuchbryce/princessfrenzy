@@ -35,13 +35,13 @@ class Game
 	PLAYER_ARROW_TIME = 35.0 / 60
 	PLAYER_FUDGE_ACTION_TIME = 0.01 #Time in seconds to allow for a player action to happen, to allow for connection speed stuff
 	
-    attr_accessor :arrowIds, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
+    attr_accessor :arrow_ids, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
 
     def initialize()
         @current_winner = nil
         @users = []
         @arrows = []
-        @arrowIds = 0
+        @arrow_ids = 0
         @sockets = []
         rows, cols = Game::WORLD_WIDTH,Game::WORLD_HEIGHT
         @levels = Array.new(rows) { Array.new(cols) }

@@ -2,7 +2,7 @@ require 'json'
 require_relative 'warp'
 require_relative 'game'
 class Level
-    attr_accessor :users, :arrows, :collision, :playercollision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
+    attr_accessor :users, :arrows, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
     @levels = Hash.new
     class << self
         attr_accessor :levels
@@ -17,7 +17,7 @@ class Level
         @spawn = {}
         rows, cols = Game::MAP_WIDTH,Game::MAP_HEIGHT
         @collision = Array.new(rows) { Array.new(cols) }
-		@playercollision = Array.new(rows) { Array.new(cols) }
+		@player_collision = Array.new(rows) { Array.new(cols) }
         @warps = []
         level = JSON.parse(File.read('../webserver/static/levels/'+file))
 
@@ -40,7 +40,7 @@ class Level
 				x = 0
 				y = 0
 				layer["data"].each do |tile|
-					@playercollision[y][x] = tile
+					@player_collision[y][x] = tile
 					x+=1
 					if x == Game::MAP_WIDTH
 						x = 0
@@ -65,18 +65,18 @@ class Level
             end
         end
         if @has_princess == true
-            randomizePrincess()
+            randomize_princess()
         end
     end
-    def randomizePrincess
-        @princess_point = findNonCollidableSpace()
+    def randomize_princess
+        @princess_point = find_noncollidable_space()
 		@princess_dir = ((Random.new(Time.now.to_i).rand() * 1000).to_i % 2) == 0 ? Game::DIRECTION_LEFT : Game::DIRECTION_RIGHT
     end
-    def findNonCollidableSpace
+    def find_noncollidable_space
         candidates = []
         for y in 0..Game::MAP_HEIGHT
             for x in 0..Game::MAP_WIDTH
-                if @collision[y][x] == 0 && @playercollision[y][x] == 0
+                if @collision[y][x] == 0 && @player_collision[y][x] == 0
 					do_push = true
 					#We do not want the princess to spawn on a warp
 					for warp in @warps
