@@ -27,13 +27,13 @@ class Game
     OK_RESPONSE = "ok"
     SERVER_MESSAGE = "S"
 
-    attr_accessor :arrowIds, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
+    attr_accessor :arrow_ids, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
 
     def initialize()
         @current_winner = nil
         @users = []
         @arrows = []
-        @arrowIds = 0
+        @arrow_ids = 0
         @sockets = []
         rows, cols = Game::WORLD_WIDTH,Game::WORLD_HEIGHT
         @levels = Array.new(rows) { Array.new(cols) }
