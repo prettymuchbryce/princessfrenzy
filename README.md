@@ -8,8 +8,14 @@ You can start the server and web server using ruby, although you may need some g
     gem install sinatra
     gem install eventmachine
     gem install em-websocket
+    gem install capistrano
+    gem install capistrano-ext
 
 Then start the web and game servers, and connect on 127.0.0.1:80
 
     sudo ruby server.rb
     sudo ruby webserver.rb
+
+Deploy to the server. By pushing to this repository. Requires pem file.
+
+    cap deploy
