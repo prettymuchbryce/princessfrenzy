@@ -11,9 +11,7 @@ set :deploy_to, "/home/ubuntu/server"
 
 namespace :deploy do
 	task :restart do
-		run "sudo killall ruby"
-		run "sudo ruby /home/ubuntu/server/current/webserver/webserver.rb"
-		run "sudo /bin/bash -c 'cd /home/ubuntu/server/current/websocketserver/ && ruby -rubygems server.rb'"
+		run "sudo reboot"
 	end
 	#task :restart, :roles => :web do
 	#	run "sudo ruby /home/ubuntu/server/current/webserver/webserver.rb"
