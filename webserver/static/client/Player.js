@@ -106,7 +106,7 @@ var Player = function(id,dir,x,y) {
 	}
 
 	this.move = function(dir,x,y) {
-		if (x==-1 && y == -1) {
+		if (x == -1 && y == -1) {
 			for (var i = 0; i < players.length; i++) {
 				if (players[i] === this) {
 					players[i].destroy();

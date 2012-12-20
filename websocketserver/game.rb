@@ -26,7 +26,15 @@ class Game
     LEADERBOARD = "R"
     OK_RESPONSE = "ok"
     SERVER_MESSAGE = "S"
-
+	#Please match these with Game.js, divided by the framerate of the client
+	#This does not stop hacking, it merely makes speedhacks less effective
+	#It does have the chance to skip an arrow/movement:
+	#Client sends arrow packet, it arrives at the server later than would be expected because of lag, server sets arrow time
+	#Client sends packet, it arrives very quickly, arrow time not yet expired, so server discards the arrow
+	PLAYER_MOVE_TIME = 5.0 / 60
+	PLAYER_ARROW_TIME = 35.0 / 60
+	PLAYER_FUDGE_ACTION_TIME = 0.01 #Time in seconds to allow for a player action to happen, to allow for connection speed stuff
+	
     attr_accessor :arrow_ids, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
 
     def initialize()

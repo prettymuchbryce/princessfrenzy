@@ -39,14 +39,17 @@ Connection.onmessage = function (e) {
 		} else if (params[0] === "Q") {
 			deletePlayer(params[1]);
 		} else if (params[0] === "A") {
-			if (!muted) {
-				soundShoot.play();
-			}
-			if (doesArrowExist(params[1]) === false) {
-				createArrow(params[1],params[2],parseInt(params[3]),parseInt(params[4]));
-			} else {
-				arrow = getArrowById(params[1]);
-				arrow.move(params[2],parseInt(params[3]),parseInt(params[4]));
+			// is this the right level for this arrow?
+			if (params[5] === levelPath) {
+				if (!muted) {
+					soundShoot.play();
+				}
+				if (doesArrowExist(params[1]) === false) {
+					createArrow(params[1],params[2],parseInt(params[3]),parseInt(params[4]),params[5]);
+				} else {
+					arrow = getArrowById(params[1]);
+					arrow.move(params[2],parseInt(params[3]),parseInt(params[4]));
+				}
 			}
 		} else if (params[0] === "D") {
 			if (!muted) {
@@ -71,16 +74,16 @@ Connection.onmessage = function (e) {
 			triggerAdminMessage(params[1]);
 		} else if (params[0] === "P") {
 			if (princess == null) {
-				princess = new Princess(params[1],params[2]);
+				princess = new Princess(params[1],params[2],params[3]);
 			} else {
-				princess.move(params[1],params[2]);
+				princess.move(params[1],params[2],params[3]);
 			}
 		} else if (params[0] === "W") {
 			if (params[1] === id) {
 				//Congrats you're winning.
 			}
 
-			if (params[1]==="null") {
+			if (params[1]==="_null") {
 				if (!muted) {
 					soundRound.play();
 				}
@@ -177,3 +180,4 @@ function login(username) {
 
 	Connection.send("L" + DELIMITER + username);
 }
+

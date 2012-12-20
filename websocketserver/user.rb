@@ -1,5 +1,5 @@
 class User
-	attr_accessor :x, :ws, :y, :id, :dir,:is_admin, :ip, :dead, :last_action, :level, :wins
+	attr_accessor :x, :ws, :y, :id, :dir, :is_admin, :ip, :dead, :last_action, :level, :wins, :next_move, :next_arrow, :spawn_protection
 	def initialize(id,ws,dir,x,y,is_admin,ip)
 		@wins = 0
 		@id = id
@@ -12,5 +12,8 @@ class User
 		@is_admin = is_admin
 		@last_action = Time.now
     	@dir = dir
+		@next_move = Time.now
+		@next_arrow = Time.now
+		@spawn_protection = Time.now
 	end
 end

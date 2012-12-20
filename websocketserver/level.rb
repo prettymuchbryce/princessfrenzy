@@ -2,7 +2,7 @@ require 'json'
 require_relative 'warp'
 require_relative 'game'
 class Level
-    attr_accessor :users, :arrows, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess
+    attr_accessor :users, :arrows, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
     @levels = Hash.new
     class << self
         attr_accessor :levels
@@ -70,16 +70,28 @@ class Level
     end
     def randomize_princess
         @princess_point = find_noncollidable_space()
+		@princess_dir = ((Random.new(Time.now.to_i).rand() * 1000).to_i % 2) == 0 ? Game::DIRECTION_LEFT : Game::DIRECTION_RIGHT
     end
     def find_noncollidable_space
         candidates = []
         for y in 0..Game::MAP_HEIGHT
             for x in 0..Game::MAP_WIDTH
                 if @collision[y][x] == 0 && @player_collision[y][x] == 0
-                    p = {}
-                    p["x"] = x
-                    p["y"] = y
-                    candidates.push(p)
+					do_push = true
+					#We do not want the princess to spawn on a warp
+					for warp in @warps
+						if warp.x == x && warp.y == y
+							do_push = false
+							break
+						end
+					end
+					
+					if do_push
+						p = {}
+						p["x"] = x
+						p["y"] = y
+						candidates.push(p)
+					end
                 end
             end
         end
