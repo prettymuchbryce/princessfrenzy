@@ -1,5 +1,6 @@
 var DELIMITER = "%";
 var ENDPOINT = "23.21.198.199";
+//var ENDPOINT = "127.0.0.1";
 var Connection = new WebSocket('ws://'+ENDPOINT+':8080', ['soap', 'xmpp']);
 var playerId = "";
 var connected = false;

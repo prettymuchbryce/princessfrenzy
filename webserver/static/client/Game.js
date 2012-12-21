@@ -70,7 +70,7 @@ $(document).ready(function() {
 	
 	// To change where assets are loaded from, change ASSET_URL here
 	// ASSET_URL = "http://place/";
-	ASSET_URL = "http://localhost/";
+	ASSET_URL = "http://23.21.198.199/";
 	initAssets(ASSET_URL);
 	
 	stage.addChild(tileLayer);

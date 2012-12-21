@@ -11,7 +11,8 @@ end
 set :allow_origin, '*'
 
 get '/' do
-	erb :index, :format => :html5
+	#erb :index, :format => :html5
+	send_file File.dirname(__FILE__) + "/static/index.html"
 end
 
 get '/*' do

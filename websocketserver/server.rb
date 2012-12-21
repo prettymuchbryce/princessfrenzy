@@ -137,23 +137,23 @@ def handle_login(ws,params,game)
   if params[1] == nil || params[1] == "" || params[2] == nil || params[2] == ""
     return
   end
-  
+
   #Make sure that the equals sign and ampersand are not present in their username or session id
   if params[1].include?("=") || params[2].include?("=") || params[1].include?("&") || params[2].include?("&")
     return
   end
   
   #Validate their session information
-  api_key = ENV["NG_API_TOKEN"]
+  api_key = ARGV[0]
   auth_response = Net::HTTP.post_form(URI.parse("http://www.ngads.com/user_auth.php"),
 	{ "user_name" => params[1], "session_id" => params[2], "secret" => api_key })
-  
+
   parsed_response = JSON.parse(auth_response.body)
 
   if parsed_response["success"] != true
     return
   end
-  
+
   user_name = parsed_response["user_name"]
   
   if !does_user_exist?(user_name,game)
