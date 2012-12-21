@@ -11,11 +11,12 @@ var TILE_SHEET_WIDTH = 16;
 var TILE_SHEET_HEIGHT = 16;
 var stage;
 var canvas;
+var canvasBg;
+var contextBg;
 var arrows = [];
 var players = [];
 var explosions = [];
 var id;
-var tiles = [];
 var dead = false;
 var tileLayer = new createjs.Container();
 var objectLayer = new createjs.Container();
@@ -64,6 +65,8 @@ function newgroundsInit() {
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
+	canvasBg = document.getElementById("canvasBg");
+	contextBg = canvasBg.getContext("2d");
 	stage = new createjs.Stage(canvas);
 	
 	newgroundsInit();
@@ -102,7 +105,6 @@ function loadLevel(path) {
 	  dataType: 'json'
 	}).done(function(payload) {
 	  destroyArrows();
-	  destroyTileMap();
 	  parseLayers(payload.layers);
 	  startRender();
 	});
@@ -122,25 +124,7 @@ function getTileById(id) {
 	return {x: x, y: y};
 }
 
-//Tile animation
-setInterval(function() {
-	if (tiles === null) {
-		return;
-	}
-	for (var i = 0; i < tiles.length; i++) {
-		if (tiles[i] === null) {
-			continue;
-		}
-		if (tiles[i].sourceRect.x/TILE_SIZE === 4 && tiles[i].sourceRect.y/TILE_SIZE === 8) {
-			tiles[i].sourceRect = {x:4*TILE_SIZE, y:7*TILE_SIZE, width: TILE_SIZE, height:TILE_SIZE};
-		} else if (tiles[i].sourceRect.x === 4*TILE_SIZE && tiles[i].sourceRect.y === 7*TILE_SIZE) {
-			tiles[i].sourceRect = {x:4*TILE_SIZE, y:8*TILE_SIZE, width: TILE_SIZE, height:TILE_SIZE};
-		}
-	}
-}, 1000);
-
 function parseLayers(layers) {
-	console.log("parse");
 	for (var i = 0; i < layers.length; i++) {
 		var layer = layers[i];
 		if (layer.name === "collision" || layer.name === "playercollision") {
@@ -152,26 +136,16 @@ function parseLayers(layers) {
 		var x = 0;
 		var y = 0;
 		for (var j = 0; j < layer.data.length; j++) {
-			var bitmap = new createjs.Bitmap(ASSET_TILES);
 			var point = getTileById(layer.data[j]);
-			bitmap.sourceRect = {x:point.x*TILE_SIZE, y:point.y*TILE_SIZE, width: TILE_SIZE, height:TILE_SIZE};
-			bitmap.x = x*TILE_SIZE;
-			bitmap.y = y*TILE_SIZE;
-			tiles.push(bitmap);
-			tileLayer.addChild(bitmap);
+			if (point.x >= 0 && point.y >= 0) {
+				contextBg.drawImage(ASSET_TILES,point.x*TILE_SIZE, point.y*TILE_SIZE,TILE_SIZE,TILE_SIZE,x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
+			}
 			x++;
 			if (x === MAP_WIDTH) {
 				x = 0;
 				y++;
 			}
 		}
-	}
-}
-
-function destroyTileMap() {
-	for (var i = 0; i < tiles.length; i++) {
-		tileLayer.removeChild(tiles[i]);
-		tiles.splice(i,1);
 	}
 }
 
