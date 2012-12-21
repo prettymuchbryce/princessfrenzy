@@ -155,21 +155,16 @@ function sendMoveUpdate(direction) {
 function sendShootArrow() {
 	Connection.send("A");
 }
+
 function connect() {
-	if ($("#username").val().length < 1) {
-		alert("You gotta enter a name, bub.")
-	} else if ($("#username").val().length > 24) {
-		alert("Username too long. Please try again");
-	} else if( /[^a-zA-Z0-9]/.test( $("#username").val() ) ) {
-		alert("Only letters and numbers are allowed. Please try again");
-	} else {
-		hideModal();
-		$(".modalContainer").hide();
-		$(".login").hide();
-		login($("#username").val());
-	}
+	hideModal();
+	$(".modalContainer").hide();
+	$(".login").hide();
+	//login($("#username").val());
+	login(PLAYER_USERNAME, PLAYER_SESSIONID);
 }
-function login(username) {
+
+function login(username,sessionid) {
 	if (username===undefined) {
 		return;
 	}
@@ -178,6 +173,6 @@ function login(username) {
 
 	id = username;
 
-	Connection.send("L" + DELIMITER + username);
+	Connection.send("L" + DELIMITER + username + DELIMITER + sessionid);
 }
 

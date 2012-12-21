@@ -24,10 +24,54 @@ var princess = null;
 var princessName = "Princess";
 var muted = false;
 var levelPath = "";
+var requestParams = [];
+var ASSET_URL = "";
+var PLAYER_USERNAME = "";
+var PLAYER_SESSIONID = "";
+
+function newgroundsInit() {
+	// http://www.bennadel.com/blog/695-Ask-Ben-Getting-Query-String-Values-In-JavaScript.htm
+	// Use the String::replace method to iterate over each
+	// name-value pair in the query string. Location.search
+	// gives us the query string (if it exists).
+	window.location.search.replace(
+		new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+		// For each matched query string pair, add that
+		// pair to the URL struct using the pre-equals
+		// value as the key.
+		function( $0, $1, $2, $3 ){
+			requestParams[ $1 ] = $3;
+		}
+	);
+	
+	// Pull the username and session id from the params
+	PLAYER_USERNAME = requestParams["NewgroundsAPI_UserName"];
+	PLAYER_SESSIONID = requestParams["NewgroundsAPI_SessionID"];
+	
+	// Now lets get the url we use to pull assets
+	var i = window.location.href.indexOf("?");
+	if (i === -1) {
+		ASSET_URL = window.location.href;
+	} else {
+		ASSET_URL = window.location.href.substring(0, i - 1);
+	}
+	
+	if(ASSET_URL[ASSET_URL.length - 1] != "/")
+		ASSET_URL += "/";
+	
+	console.log(requestParams);
+}
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
 	stage = new createjs.Stage(canvas);
+	
+	newgroundsInit();
+	
+	// To change where assets are loaded from, change ASSET_URL here
+	// ASSET_URL = "http://place/";
+	ASSET_URL = "http://localhost/";
+	initAssets(ASSET_URL);
 	
 	stage.addChild(tileLayer);
 	stage.addChild(objectLayer);
@@ -53,7 +97,9 @@ function loadLevel(path) {
 	levelPath = path;
 	stopRender();
 	$.ajax({
-	  url: "levels/"+path+"?r="+(new Date()).getTime()
+	  url: ASSET_URL + "levels/"+path+"?r="+(new Date()).getTime(),
+	  crossDomain: true,
+	  dataType: 'json'
 	}).done(function(payload) {
 	  destroyArrows();
 	  destroyTileMap();

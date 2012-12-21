@@ -1,5 +1,7 @@
 require 'eventmachine'
 require 'em-websocket'
+require 'net/http'
+require 'json'
 require_relative 'game.rb'
 require_relative 'arrow.rb'
 require_relative 'user.rb'
@@ -132,19 +134,38 @@ def handle_chat(user,ws,params,game)
 end
 
 def handle_login(ws,params,game)
-  if params[1] == nil || params[1] == ""
+  if params[1] == nil || params[1] == "" || params[2] == nil || params[2] == ""
     return
   end
-  if !does_user_exist?(params[1],game)
+  
+  #Make sure that the equals sign and ampersand are not present in their username or session id
+  if params[1].include?("=") || params[2].include?("=") || params[1].include?("&") || params[2].include?("&")
+    return
+  end
+  
+  #Validate their session information
+  api_key = ENV["NG_API_TOKEN"]
+  auth_response = Net::HTTP.post_form(URI.parse("http://www.ngads.com/user_auth.php"),
+	{ "user_name" => params[1], "session_id" => params[2], "secret" => api_key })
+  
+  parsed_response = JSON.parse(auth_response.body)
+
+  if parsed_response["success"] != true
+    return
+  end
+  
+  user_name = parsed_response["user_name"]
+  
+  if !does_user_exist?(user_name,game)
     ws.send Game::OK_RESPONSE
 
     port, ip = Socket.unpack_sockaddr_in(ws.get_peername)
 
-    if params[1] == "bryceisadmin7220"
-      user = User.new("Bryce", ws, Game::DIRECTION_UP, 5, 5, true, ip)
-    else
-      user = User.new(params[1], ws, Game::DIRECTION_UP, 5, 5, false, ip)
-    end
+    #if params[1] == "bryceisadmin7220"
+     # user = User.new("Bryce", ws, Game::DIRECTION_UP, 5, 5, true, ip)
+    #else
+      user = User.new(user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
+    #end
 
     if game.current_winner != nil
       send_winning_message(game,user.ws,game.current_winner.id)
