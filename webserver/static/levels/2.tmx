@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="25" height="20" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" width="25" height="14" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
   <image source="../assets/tiles.png" width="512" height="512"/>
  </tileset>
- <layer name="ground" width="25" height="20">
+ <objectgroup name="objects" width="25" height="14"/>
+ <layer name="ground" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJytVdsNxCAMo5X6yUg3FiMwVLsBX13pVIlIlutA0N2HBSIPh5hHSSkVgUpY9VG2X3LyuuKzsQ2wO6MHr5bHdv8BTeRGjuzgI+D5tvTWQHE8861j78D8tmY+HOtpbn4Wxz1ADrZZjOJA/Y3D4kb9YhvGtPSunzkuiEU75ixi/UpvPWaa8/3APipbRPNKexjlUbarQ+mBc3UWN2d9dnY93bHOSD7FP3pbqqN1pFclwBHVnG0Wfw40Rz2M4wTgfvCeMfcqRxZxM6AvnyN+d1fOjwf173AvRshBP++fm/0LR+c4Ar5Y/xfLwb4/
+   eJzzZGBg8BzFo5gEnDwI3DDScTgd7fKgk39AOJmGfgvHgmlhRzIRdgAAnRZk0g==
   </data>
  </layer>
- <layer name="detail" width="25" height="20">
+ <layer name="detail" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFlII+NBqXGD5xckEPlcwZBaNgFIyCUTB4wEUy9AAA+gwEsg==
+   eJxjYBh6IAqIvbCIYxMbDMCXRPU+RIpRauZAgigqmhWAQ9yPinYMBoArDklJ97nUcAgSIDVtEwPwxRsu+3ClJ2qVCbjcRG46BgDTPgZP
   </data>
  </layer>
- <layer name="collision" width="25" height="20" visible="0">
+ <layer name="collision" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJzFlTEOACAIA/my/1/cjdDSYmzCROEwRI2IWEmwcuunlc2jxG/GhFgGmq3KMwzm/JWnw+hIYSjqMFAf5HPzDF/poexmUj/fpUzuLpg+tzt45rP6LoPxolrX54h9s1//HwpjA67YQjc=
+   eJxjYBh6IBCKsYkPRkCqu2jht8EWNtR0Dy6zBpufKQWD0Z+0sBufmaSGAbXcR23zAZgWBgQ=
   </data>
  </layer>
- <layer name="playercollision" width="25" height="20" visible="0">
+ <layer name="player_collision" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJwrZGBgKBxmmJpg1I5RO/DZgUueFH341OKTJ1UvOeZQyw5KADF2UGIfseUJqeFISC894xwboHXaJRcMljRFS3toZQcAfideBg==
+   eJxjYBgFo2AUjIJRQE8AAAV4AAE=
   </data>
  </layer>
- <objectgroup name="objects" width="25" height="20">
-  <object type="WARP" x="388" y="619" width="23" height="17">
-   <properties>
-    <property name="target" value="1.json"/>
-   </properties>
-  </object>
-  <object type="SPAWN" x="389" y="580" width="21" height="21"/>
-  <object x="-76" y="-112"/>
- </objectgroup>
 </map>

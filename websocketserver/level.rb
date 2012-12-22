@@ -2,7 +2,7 @@ require 'json'
 require_relative 'warp'
 require_relative 'game'
 class Level
-    attr_accessor :users, :arrows, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
+    attr_accessor :users, :bullets, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
     @levels = Hash.new
     class << self
         attr_accessor :levels
@@ -13,7 +13,7 @@ class Level
         end
         @file = file
         @users = []
-        @arrows = []
+        @bullets = []
         @spawn = {}
         rows, cols = Game::MAP_WIDTH,Game::MAP_HEIGHT
         @collision = Array.new(rows) { Array.new(cols) }
@@ -36,7 +36,7 @@ class Level
                         y +=1
                     end
                 end
-			elsif layer["name"] == "playercollision"
+			elsif layer["name"] == "player_collision"
 				x = 0
 				y = 0
 				layer["data"].each do |tile|

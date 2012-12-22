@@ -7,7 +7,7 @@ class Game
     DIRECTION_RIGHT = 1
     DIRECTION_DOWN = 2
     DIRECTION_LEFT = 3
-    MAP_HEIGHT = 640/32
+    MAP_HEIGHT = 448/32
     TIMEOUT_SECONDS = 60*5
     MAP_WIDTH = 800/32
     WORLD_WIDTH = 1
@@ -22,26 +22,28 @@ class Game
     DIE = "D"
     MOVE = "M"
     WINNING = "W"
-    ARROW = "A"
+    BULLET = "A"
     LEADERBOARD = "R"
     OK_RESPONSE = "ok"
     SERVER_MESSAGE = "S"
+
+    
 	#Please match these with Game.js, divided by the framerate of the client
 	#This does not stop hacking, it merely makes speedhacks less effective
-	#It does have the chance to skip an arrow/movement:
-	#Client sends arrow packet, it arrives at the server later than would be expected because of lag, server sets arrow time
-	#Client sends packet, it arrives very quickly, arrow time not yet expired, so server discards the arrow
+	#It does have the chance to skip a bullet/movement:
+	#Client sends bullet packet, it arrives at the server later than would be expected because of lag, server sets bullet time
+	#Client sends packet, it arrives very quickly, bullet time not yet expired, so server discards the bullet
 	PLAYER_MOVE_TIME = 5.0 / 60
-	PLAYER_ARROW_TIME = 35.0 / 60
+	PLAYER_BULLET_TIME = 35.0 / 60
 	PLAYER_FUDGE_ACTION_TIME = 0.01 #Time in seconds to allow for a player action to happen, to allow for connection speed stuff
 	
-    attr_accessor :arrow_ids, :sockets, :users, :arrows, :banned, :levels, :princess_time, :current_winner
+    attr_accessor :bullet_ids, :sockets, :users, :bullets, :banned, :levels, :princess_time, :current_winner
 
     def initialize()
         @current_winner = nil
         @users = []
-        @arrows = []
-        @arrow_ids = 0
+        @bullets = []
+        @bullet_ids = 0
         @sockets = []
         rows, cols = Game::WORLD_WIDTH,Game::WORLD_HEIGHT
         @levels = Array.new(rows) { Array.new(cols) }

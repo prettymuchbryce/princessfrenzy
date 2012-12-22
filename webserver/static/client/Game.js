@@ -1,67 +1,38 @@
+//Constants should always be declared at the top of a file. Not within the code.
+
+//Game Constants
 var DIRECTION_UP = 0;
 var DIRECTION_RIGHT = 1;
 var DIRECTION_DOWN = 2;
 var DIRECTION_LEFT = 3;
 var TILE_SIZE = 32;
 var CANVAS_WIDTH = 800;
-var CANVAS_HEIGHT = 640;
+var CANVAS_HEIGHT = 448;
 var MAP_HEIGHT = CANVAS_HEIGHT/TILE_SIZE;
 var MAP_WIDTH = CANVAS_WIDTH/TILE_SIZE;
 var TILE_SHEET_WIDTH = 16;
 var TILE_SHEET_HEIGHT = 16;
+
+//HTML5, and Framework globals.
 var stage;
 var canvas;
 var canvasBg;
 var contextBg;
+var tileLayer = new createjs.Container();
+var objectLayer = new createjs.Container();
+
+var muted = false;
+var id;
+var dead = false;
 var arrows = [];
 var players = [];
 var explosions = [];
-var id;
-var dead = false;
-var tileLayer = new createjs.Container();
-var objectLayer = new createjs.Container();
 var server_texts = [];
 var princess = null;
-var princessName = "Princess";
-var muted = false;
-var levelPath = "";
 var requestParams = [];
-var ASSET_URL = "";
-var PLAYER_USERNAME = "";
-var PLAYER_SESSIONID = "";
-
-function newgroundsInit() {
-	// http://www.bennadel.com/blog/695-Ask-Ben-Getting-Query-String-Values-In-JavaScript.htm
-	// Use the String::replace method to iterate over each
-	// name-value pair in the query string. Location.search
-	// gives us the query string (if it exists).
-	window.location.search.replace(
-		new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
-		// For each matched query string pair, add that
-		// pair to the URL struct using the pre-equals
-		// value as the key.
-		function( $0, $1, $2, $3 ){
-			requestParams[ $1 ] = $3;
-		}
-	);
-	
-	// Pull the username and session id from the params
-	PLAYER_USERNAME = requestParams["NewgroundsAPI_UserName"];
-	PLAYER_SESSIONID = requestParams["NewgroundsAPI_SessionID"];
-	
-	// Now lets get the url we use to pull assets
-	var i = window.location.href.indexOf("?");
-	if (i === -1) {
-		ASSET_URL = window.location.href;
-	} else {
-		ASSET_URL = window.location.href.substring(0, i - 1);
-	}
-	
-	if(ASSET_URL[ASSET_URL.length - 1] != "/")
-		ASSET_URL += "/";
-	
-	console.log(requestParams);
-}
+var levelPath = "";
+var ASSET_URL = "http://127.0.0.1/";
+//var ASSET_URL = "http://23.21.198.199/";
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
@@ -69,11 +40,8 @@ $(document).ready(function() {
 	contextBg = canvasBg.getContext("2d");
 	stage = new createjs.Stage(canvas);
 	
-	newgroundsInit();
-	
 	// To change where assets are loaded from, change ASSET_URL here
 	// ASSET_URL = "http://place/";
-	ASSET_URL = "http://23.21.198.199/";
 	initAssets(ASSET_URL);
 	
 	stage.addChild(tileLayer);
@@ -82,9 +50,6 @@ $(document).ready(function() {
 	createjs.Ticker.setFPS(60);
 
 	setTimeout(function() {
-		if (!muted) {
-			soundIntro.play();
-		}
 		$(".modalContainer").css("display","block");
 	},400);
 });

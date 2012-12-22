@@ -1,4 +1,4 @@
-class Arrow
+class Bullet
   attr_accessor :x, :y, :dir, :id, :level, :owner
   def initialize(id,dir,x,y,level,owner)
     @id = id;

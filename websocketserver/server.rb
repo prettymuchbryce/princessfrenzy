@@ -3,65 +3,10 @@ require 'em-websocket'
 require 'net/http'
 require 'json'
 require_relative 'game.rb'
-require_relative 'arrow.rb'
+require_relative 'bullet.rb'
+require_relative 'messaging.rb'
 require_relative 'user.rb'
 require_relative 'helpers.rb'
-
-def send_move_message(game,ws,user)
-  message = Game::MOVE + Game::DELIMITER + user.id + Game::DELIMITER + user.dir.to_s + Game::DELIMITER + user.x.to_s + Game::DELIMITER + user.y.to_s + Game::DELIMITER + user.dead.to_s
-  ws.send message
-end
-
-def send_specific_move_message(game,ws,user,x,y)
-  message = Game::MOVE + Game::DELIMITER + user.id + Game::DELIMITER + user.dir.to_s + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s + Game::DELIMITER + user.dead.to_s
-  ws.send message
-end
-
-def send_winning_message(game,ws,userId)
-  message = Game::WINNING + Game::DELIMITER + userId
-  ws.send message
-end
-
-def send_server_message_message(game,ws,message)
-  message = Game::SERVER_MESSAGE + Game::DELIMITER + message
-  ws.send message
-end
-
-def send_arrow_message(game,ws,arrow)
-  message = Game::ARROW + Game::DELIMITER + arrow.id + Game::DELIMITER + arrow.dir.to_s + Game::DELIMITER + arrow.x.to_s + Game::DELIMITER + arrow.y.to_s + Game::DELIMITER + arrow.level.file
-  ws.send message
-end
-
-
-def send_leaderboard_message(game,ws,html)
-  message = Game::LEADERBOARD + Game::DELIMITER + html
-  ws.send message
-end
-
-def send_level_message(game,ws,file)
-  message = Game::LEVEL + Game::DELIMITER + file
-  ws.send message
-end
-
-def send_princess_message(game,ws,x,y,dir)
-  message = Game::PRINCESS + Game::DELIMITER + x.to_s + Game::DELIMITER + y.to_s + Game::DELIMITER + dir.to_s
-  ws.send message
-end
-
-def send_die_message(game,ws,user)
-  message = Game::DIE + Game::DELIMITER + user.id
-  ws.send message
-end
-
-def send_banned_message(game,ws)
-  message = Game::BANNED
-  ws.send message
-end
-
-def send_chat_message(game,ws,sender,message)
-  message = Game::CHAT + Game::DELIMITER + sender + Game::DELIMITER + message.to_s
-  ws.send message
-end
 
 def add_user_to_level(game,user,level)
     send_level_message(game, user.ws, level.file)
@@ -84,8 +29,8 @@ def add_user_to_level(game,user,level)
       send_move_message(game,user_already_in_level.ws,user) #Tell each player about this new person
     end
 
-    level.arrows.each do |arrow|
-      send_arrow_message(game, user.ws, arrow)
+    level.bullets.each do |bullet|
+      send_bullet_message(game, user.ws, bullet)
     end
 end
 
@@ -104,10 +49,6 @@ end
 
 def remove_user_from_level(game,user,level)
   level.users.delete(user)
-
-  if level.file == "2.json"
-    send_princess_message(game,user.ws,-1,-1,Game::DIRECTION_RIGHT)
-  end
 
   user.x = -1
   user.y = -1
@@ -139,37 +80,19 @@ def handle_login(ws,params,game)
   end
 
   #Make sure that the equals sign and ampersand are not present in their username or session id
-  if params[1].include?("=") || params[2].include?("=") || params[1].include?("&") || params[2].include?("&")
-    return
-  end
-  
-  #Validate their session information
-  api_key = ARGV[0]
-  auth_response = Net::HTTP.post_form(URI.parse("http://www.ngads.com/user_auth.php"),
-	{ "user_name" => params[1], "session_id" => params[2], "secret" => api_key })
-
-  parsed_response = JSON.parse(auth_response.body)
-
-  if parsed_response["success"] != true
+  if params[1].include?("=") || params[1].include?("&")
     return
   end
 
-  user_name = parsed_response["user_name"]
+  user_name = params[1]
+  password = params[2] #Not used yet
   
   if !does_user_exist?(user_name,game)
     ws.send Game::OK_RESPONSE
 
     port, ip = Socket.unpack_sockaddr_in(ws.get_peername)
 
-    #if params[1] == "bryceisadmin7220"
-     # user = User.new("Bryce", ws, Game::DIRECTION_UP, 5, 5, true, ip)
-    #else
-      user = User.new(user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
-    #end
-
-    if game.current_winner != nil
-      send_winning_message(game,user.ws,game.current_winner.id)
-    end
+    user = User.new(user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
 
     game.users.push(user)
 
@@ -221,34 +144,24 @@ def handle_move(user,ws,params,game)
     end
   end
 
-  if user.level == Level.levels["2.json"]
-    if user.x == Level.levels["2.json"].princess_point["x"] && user.y == Level.levels["2.json"].princess_point["y"] && game.current_winner != user
-      game.current_winner = user
-      user.level.users.each do |u|
-        send_server_message_message(game,u.ws,user.id + " claims the princess. " + game.princess_time.to_s + " seconds left.")
-        send_winning_message(game,u.ws,user.id)
-      end
-    end
-  end
-
   user.level.users.each do |user_in_level|
     send_move_message(game,user_in_level.ws,user)
   end
 end
 
-def handle_arrow(user,ws,params,game)
+def handle_bullet(user,ws,params,game)
   if user==nil || user.dead
     return
   end
   
-  if Time.now < user.next_arrow - Game::PLAYER_FUDGE_ACTION_TIME
+  if Time.now < user.next_bullet - Game::PLAYER_FUDGE_ACTION_TIME
 	return
   end
   
-  user.next_arrow = Time.now + Game::PLAYER_ARROW_TIME
+  user.next_bullet = Time.now + Game::PLAYER_BULLET_TIME
 
   #if user.level == game.levels[0][0]
-  #  sendServerMessageMessage(game,ws,"You cannot fire arrows here.")
+  #  sendServerMessageMessage(game,ws,"You cannot fire bullets here.")
   #  return
   #end
 
@@ -267,12 +180,12 @@ def handle_arrow(user,ws,params,game)
   else
     return
   end
-  arrow = Arrow.new(game.arrow_ids.to_s, user.dir, x, y, user.level, user.id)
-  game.arrow_ids+=1
-  game.arrows.push(arrow)
+  bullet = Bullet.new(game.bullet_ids.to_s, user.dir, x, y, user.level, user.id)
+  game.bullet_ids+=1
+  game.bullets.push(bullet)
 
-  arrow.level.users.each do |user|
-    send_arrow_message(game, user.ws, arrow)
+  bullet.level.users.each do |user|
+    send_bullet_message(game, user.ws, bullet)
   end
 end
 
@@ -299,8 +212,8 @@ def parse_message(ws,msg,game)
 
 	if msg[0] == Game::MOVE
     handle_move(user,ws,params,game)
-  elsif msg[0] == Game::ARROW
-    handle_arrow(user,ws,params,game)
+  elsif msg[0] == Game::BULLET
+    handle_bullet(user,ws,params,game)
   elsif msg[0] == Game::CHAT
     handle_chat(user,ws,params,game)
   elsif msg[0] == "V"
@@ -311,42 +224,6 @@ end
 game = Game.new
 
 EventMachine.run {
-    EM.add_periodic_timer(1) do
-      game.princess_time-=1
-      if game.princess_time == 0
-        if game.current_winner !=nil
-          game.current_winner.wins+=1
-
-          game.users.each do |user|
-            send_server_message_message(game,user.ws,game.current_winner.id.to_s + " held onto the princess, and wins the round.")
-          end
-        
-          game.current_winner = nil
-        end
-        game.princess_time = 60
-        Level.levels["2.json"].randomize_princess
-
-        Level.levels["2.json"].users.each do |user|
-          send_princess_message(game,user.ws,Level.levels["2.json"].princess_point["x"],Level.levels["2.json"].princess_point["y"],Level.levels["2.json"].princess_dir)
-          send_winning_message(game,user.ws,"_null")
-        end
-
-        #Send leaderboard info
-        game.users = game.users.sort! { |a, b|  a.wins <=> b.wins }
-
-        game.users = game.users.reverse
-
-        html = ""
-        game.users.each do |user|
-          html = html+"<li>" + user.id + " - " + user.wins.to_s + "</li>"
-        end
-
-        game.users.each do |user|
-          send_leaderboard_message(game,user.ws,html)
-        end
-
-      end
-    end
     EM.add_periodic_timer(30) do
       #let server see list of users
       puts "Connected users:"
@@ -358,22 +235,22 @@ EventMachine.run {
       end
     end
     EM.add_periodic_timer(0.05) do
-      game.arrows.each do |arrow|
+      game.bullets.each do |bullet|
 
         game.users.each do |user|
-          if arrow.level.collision[arrow.y][arrow.x] !=0
-            arrow.x = -1
-            arrow.y = -1
+          if bullet.level.collision[bullet.y][bullet.x] !=0
+            bullet.x = -1
+            bullet.y = -1
           end
 
-          if arrow.owner != user.id && user.x == arrow.x && user.y == arrow.y && user.dead == false && arrow.level == user.level
+          if bullet.owner != user.id && user.x == bullet.x && user.y == bullet.y && user.dead == false && bullet.level == user.level
             send_server_message_message(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
 
-              # delete arrow
-              arrow.x = -1
-              arrow.y = -1
+              # delete bullet
+              bullet.x = -1
+              bullet.y = -1
 
               timer = EventMachine::Timer.new(20) do
                 if user!=nil
@@ -386,24 +263,24 @@ EventMachine.run {
           end
         end
 
-        arrow.level.users.each do |user|
-          send_arrow_message(game, user.ws, arrow)
+        bullet.level.users.each do |user|
+          send_bullet_message(game, user.ws, bullet)
         end
 
 		
-		# we move the arrows after checking collision
-		if arrow.x >= 0 && arrow.y >= 0 && arrow.x < Game::MAP_WIDTH && arrow.y < Game::MAP_HEIGHT
-			if arrow.dir.to_s == Game::DIRECTION_UP.to_s
-				arrow.y-=1
-			elsif arrow.dir.to_s == Game::DIRECTION_DOWN.to_s
-				arrow.y+=1
-			elsif arrow.dir.to_s == Game::DIRECTION_LEFT.to_s
-				arrow.x-=1
-			elsif arrow.dir.to_s == Game::DIRECTION_RIGHT.to_s
-				arrow.x+=1
+		# we move the bullets after checking collision
+		if bullet.x >= 0 && bullet.y >= 0 && bullet.x < Game::MAP_WIDTH && bullet.y < Game::MAP_HEIGHT
+			if bullet.dir.to_s == Game::DIRECTION_UP.to_s
+				bullet.y-=1
+			elsif bullet.dir.to_s == Game::DIRECTION_DOWN.to_s
+				bullet.y+=1
+			elsif bullet.dir.to_s == Game::DIRECTION_LEFT.to_s
+				bullet.x-=1
+			elsif bullet.dir.to_s == Game::DIRECTION_RIGHT.to_s
+				bullet.x+=1
 			end
 		else
-          game.arrows.delete(arrow)
+          game.bullets.delete(bullet)
         end
 
       end

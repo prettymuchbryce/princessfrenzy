@@ -1,6 +1,6 @@
 var DELIMITER = "%";
-//var ENDPOINT = "127.0.0.1";
-var ENDPOINT = "23.21.198.199";
+var ENDPOINT = "127.0.0.1";
+//var ENDPOINT = "23.21.198.199";
 var Connection = new WebSocket('ws://'+ENDPOINT+':8080', ['soap', 'xmpp']);
 var playerId = "";
 var connected = false;
@@ -29,7 +29,7 @@ Connection.onmessage = function (e) {
 				soundMove.play();
 			}
 			if (doesPlayerExist(params[1]) === false) {
-				p = createPlayer(params[1],params[2],params[3],params[4]);
+				p = createPlayer(params[1],params[1],params[2],params[3],params[4]);
 				if (params[5] === "true") {
 					p.die();
 				}
@@ -161,12 +161,15 @@ function connect() {
 	hideModal();
 	$(".modalContainer").hide();
 	$(".login").hide();
-	//login($("#username").val());
-	login(PLAYER_USERNAME, PLAYER_SESSIONID);
+	login($("#username").val(),"todo");
 }
 
-function login(username,sessionid) {
+function login(username,password) {
 	if (username===undefined) {
+		return;
+	}
+
+	if (password===undefined) {
 		return;
 	}
 
@@ -174,6 +177,6 @@ function login(username,sessionid) {
 
 	id = username;
 
-	Connection.send("L" + DELIMITER + username + DELIMITER + sessionid);
+	Connection.send("L" + DELIMITER + username + DELIMITER + password);
 }
 
