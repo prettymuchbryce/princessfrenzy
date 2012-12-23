@@ -31,8 +31,8 @@ var server_texts = [];
 var princess = null;
 var requestParams = [];
 var levelPath = "";
-var ASSET_URL = "http://127.0.0.1/";
-//var ASSET_URL = "http://23.21.198.199/";
+//var ASSET_URL = "http://127.0.0.1/";
+var ASSET_URL = "http://23.21.198.199/";
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
