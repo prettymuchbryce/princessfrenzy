@@ -23,6 +23,7 @@ var objectLayer = new createjs.Container();
 
 var muted = true;
 var id;
+var self = undefined;
 var dead = false;
 var arrows = [];
 var players = [];
@@ -110,6 +111,13 @@ function parseLayers(layers) {
 			}
 		}
 	}
+}
+
+function getSelf() {
+	if (self===undefined) {
+		self = getPlayerById(id);
+	}
+	return self;
 }
 
 function getPlayerById(id) {

@@ -1,3 +1,5 @@
+//Base entity class
+
 var Entity = function(asset,x,y,dir,id,name) {
 	/* Whether or not this entity is dead. */
 	this.dead = false;
