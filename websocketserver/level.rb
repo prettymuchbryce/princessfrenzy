@@ -2,15 +2,12 @@ require 'json'
 require_relative 'warp'
 require_relative 'game'
 class Level
-    attr_accessor :users, :bullets, :collision, :player_collision, :warps, :spawn, :file, :princess_point, :has_princess, :princess_dir
+    attr_accessor :users, :bullets, :collision, :player_collision, :warps, :spawn, :file
     @levels = Hash.new
     class << self
         attr_accessor :levels
     end
     def initialize(file)
-        if file == "2.json"
-            @has_princess = true
-        end
         @file = file
         @users = []
         @bullets = []
