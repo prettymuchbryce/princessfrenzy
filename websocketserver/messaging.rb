@@ -1,4 +1,4 @@
-DEBUG = false
+DEBUG = true
 
 def send_move_message(game,ws,user)
   message = Game::MOVE + Game::DELIMITER + user.id + Game::DELIMITER + user.dir.to_s + Game::DELIMITER + user.x.to_s + Game::DELIMITER + user.y.to_s + Game::DELIMITER + user.dead.to_s

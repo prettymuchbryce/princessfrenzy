@@ -21,7 +21,7 @@ var contextBg;
 var tileLayer = new createjs.Container();
 var objectLayer = new createjs.Container();
 
-var muted = false;
+var muted = true;
 var id;
 var dead = false;
 var arrows = [];
@@ -166,8 +166,8 @@ function killPlayer(d) {
 	}
 }
 
-function createPlayer(id,dir, x,y) {
-	p = new Player(id,dir,x,y);
+function createPlayer(id,name, dir, x,y) {
+	p = new Player(id,name,dir,x,y);
 	players.push(p);
 	return p;
 }
