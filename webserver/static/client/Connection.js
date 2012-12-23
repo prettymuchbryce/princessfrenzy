@@ -153,7 +153,7 @@ function sendMoveUpdate(direction) {
 	if (direction === DIRECTION_UP) {
 		getSelf().move(DIRECTION_UP,getSelf().x,getSelf().y-1);
 	} else if (direction === DIRECTION_LEFT) {
-		getSelf().move(DIRECTION_LEFT,getSelf().x-1,getSelf().y-1);
+		getSelf().move(DIRECTION_LEFT,getSelf().x-1,getSelf().y);
 	} else if (direction === DIRECTION_DOWN) {
 		getSelf().move(DIRECTION_DOWN,getSelf().x,getSelf().y+1);
 	} else if (direction === DIRECTION_RIGHT) {
