@@ -10,9 +10,14 @@ end
 
 set :allow_origin, '*'
 
+if ARGV[0] == "production"
+	environment = "production"
+else
+	environment = "alpha"
+end
+
 get '/' do
-	#erb :index, :format => :html5
-	send_file File.dirname(__FILE__) + "/static/index.html"
+	erb :index, :format => :html5, :locals => {:env => environment}
 end
 
 get '/*' do

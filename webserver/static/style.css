@@ -2,15 +2,6 @@
 	position:absolute;
 	margin-left: -400px;
 }
-.canvasTexture {
-	background-image: url("assets/canvastexture.png");
-	margin-left: -400px;
-	position: absolute;
-	z-index: 100;
-	opacity: .6;
-	width: 800px;
-	height: 448px;
-}
 .header {
 	font-family: "flyswim";
 	display: block;
@@ -26,6 +17,7 @@
 	font-size: 50px;
 }
 body {
+	background-image: url("assets/canvastexture.png");
 	background-color: #111111;
 	font-family: "ff-meta-serif-web-pro";
 	margin: 0px;
