@@ -46,13 +46,13 @@ class Level
 				end
             elsif layer["name"] == "objects"
                 layer["objects"].each do |object|
-                    if object["type"] == "WARP"
+                    if object["type"] == Warp::WARP || object["type"] == Warp::WARP_DOWN || object["type"] == Warp::WARP_UP || object["type"] == Warp::WARP_LEFT || object["type"] == Warp::WARP_RIGHT
                         if !Level.levels[object["properties"]["target"]]
                             level = Level.new(object["properties"]["target"])
                         else
                             level = Level.levels[object["properties"]["target"]]
                         end
-                        warp = Warp.new((object["x"]/Game::TILE_SIZE).floor,(object["y"]/Game::TILE_SIZE).floor,level)
+                        warp = Warp.new((object["x"]/Game::TILE_SIZE).floor,(object["y"]/Game::TILE_SIZE).floor,level,object["type"])
                         @warps.push(warp)
                     elsif object["type"] == "SPAWN"
                         @spawn["x"] = (object["x"]/Game::TILE_SIZE).floor
@@ -61,13 +61,6 @@ class Level
                 end
             end
         end
-        if @has_princess == true
-            randomize_princess()
-        end
-    end
-    def randomize_princess
-        @princess_point = find_noncollidable_space()
-		@princess_dir = ((Random.new(Time.now.to_i).rand() * 1000).to_i % 2) == 0 ? Game::DIRECTION_LEFT : Game::DIRECTION_RIGHT
     end
     def find_noncollidable_space
         candidates = []

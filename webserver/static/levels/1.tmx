@@ -20,9 +20,9 @@
  </layer>
  <objectgroup name="objects" width="25" height="14">
   <object type="SPAWN" x="202" y="287" width="81" height="46"/>
-  <object x="51" y="81" width="44" height="46">
+  <object type="WARP_DOWN" x="49" y="79" width="44" height="46">
    <properties>
-    <property name="WARP_DOWN" value="2.json"/>
+    <property name="target" value="2.json"/>
    </properties>
   </object>
   <object type="NPC_WANDER" x="512" y="249" width="33" height="33">

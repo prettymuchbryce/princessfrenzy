@@ -54,9 +54,9 @@
                  "name":"",
                  "properties":
                     {
-                     "WARP_DOWN":"2.json"
+                     "target":"2.json"
                     },
-                 "type":"",
+                 "type":"WARP_DOWN",
                  "width":44,
                  "x":51,
                  "y":81

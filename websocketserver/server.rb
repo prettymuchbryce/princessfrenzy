@@ -8,18 +8,14 @@ require_relative 'messaging.rb'
 require_relative 'user.rb'
 require_relative 'helpers.rb'
 
-def add_user_to_level(game,user,level)
+def add_user_to_level(x, y, game,user,level)
     send_level_message(game, user.ws, level.file)
 
-    user.x = level.spawn["x"]
-    user.y = level.spawn["y"]
+    user.x = x
+    user.y = y
 
     level.users.each do |user_already_in_level|
       send_move_message(game,user.ws,user_already_in_level) #Tell this person about all the players
-    end
-
-    if level.file == "2.json"
-      send_princess_message(game,user.ws,level.princess_point["x"],level.princess_point["y"],level.princess_dir)
     end
 
     level.users.push(user)
@@ -36,13 +32,6 @@ end
 
 def remove_user_from_game(game,user)
   #Is this user the current winner?
-  if user == game.current_winner
-    game.current_winner = nil
-	user.level.users.each do |u|
-      send_server_message_message(game,u.ws,user.id + " gives up the princess. " + game.princess_time.to_s + " seconds left.")
-      send_winning_message(game,u.ws,"_null")
-    end
-  end
   remove_user_from_level(game,user,user.level)
   game.users.delete(user)
 end
@@ -96,7 +85,7 @@ def handle_login(ws,params,game)
 
     game.users.push(user)
 
-    add_user_to_level(game,user,game.levels[0][0])
+    add_user_to_level(4,4,game,user,game.levels[0][0])
   end
 end
 
@@ -106,7 +95,7 @@ def handle_move(user,ws,params,game)
   end
   
   if Time.now < user.next_move - Game::PLAYER_FUDGE_ACTION_TIME
-	return
+    return
   end
   
   user.next_move = Time.now + Game::PLAYER_MOVE_TIME
@@ -119,7 +108,7 @@ def handle_move(user,ws,params,game)
   user.dir = params[1].to_s
   
   if params[1].to_s == Game::DIRECTION_UP.to_s
-	y -= 1
+    y -= 1
   elsif params[1].to_s == Game::DIRECTION_DOWN.to_s
     y += 1
   elsif params[1].to_s == Game::DIRECTION_LEFT.to_s
@@ -130,15 +119,43 @@ def handle_move(user,ws,params,game)
     # this is an invalid direction....
     user.dir = dir
   end
+
+  user.level.warps.each do |warp|
+    if warp.type == Warp::WARP_DOWN && y == Game::MAP_HEIGHT
+        newX = user.x
+        newY = 0
+        remove_user_from_level(game,user,user.level)
+        add_user_to_level(newX,newY,game,user,warp.level)
+        return  
+    elsif warp.type == Warp::WARP_UP && y == -1
+        newX = user.x
+        newY = Game::MAP_HEIGHT-1
+        remove_user_from_level(game,user,user.level)
+        add_user_to_level(newX,newY,game,user,warp.level)
+        return  
+    elsif warp.type == Warp::WARP_LEFT && x == -1
+        newX = Game::MAP_WIDTH-1
+        newY = user.y
+        remove_user_from_level(game,user,user.level)
+        add_user_to_level(newX,newY,game,user,warp.level)
+        return  
+    elsif warp.type == Warp::WARP_RIGHT && x == Game::MAP_WIDTH
+        newX = 0
+        newY = user.y
+        remove_user_from_level(game,user,user.level)
+        add_user_to_level(newX,newY,game,user,warp.level)
+        return  
+    end
+  end
   
   # now lets make sure they can actually move there
   if x >= 0 && x < Game::MAP_WIDTH && y >= 0 && y < Game::MAP_HEIGHT && user.level.collision[y][x] == 0 && user.level.player_collision[y][x] == 0
     user.x = x
-	user.y = y
+	  user.y = y
   end
 
   user.level.warps.each do |warp|
-    if warp.x == user.x && warp.y == user.y
+    if warp.type == Warp::WARP && warp.x == user.x && warp.y == user.y
         remove_user_from_level(game,user,user.level)
         add_user_to_level(game,user,warp.level)
     end

@@ -3,31 +3,25 @@
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
   <image source="../assets/tiles.png" width="512" height="512"/>
  </tileset>
+ <objectgroup name="objects" width="25" height="14"/>
  <layer name="ground" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJzzZGBg8BzFo5gEnDwI3DDScTgd7fKgk39AOJmGfgvHgmlhRzIRdgAAnRZk0g==
+   eJylVMkNACEIpLztwALsv4fdx5oYwhzigxgBGYbDGRHzk/GfXRkkztgk+zNf9qayZV32q+woXsVNcUE5uDgIU3G/7RnrCaqn87aLcVJTZHO5uBy6GLd5ob1SM6Y4ODVf+kdgnPRKzVXlV+XFZpD1C/0tLg9nv1mMdX8Bv8OCGA==
   </data>
  </layer>
  <layer name="detail" width="25" height="14">
   <data encoding="base64" compression="zlib">
-   eJxjYBh6IAqIvbCIYxMbDMCXRPU+RIpRauZAgigqmhWAQ9yPinYMBoArDklJ97nUcAgSIDVtEwPwxRsu+3ClJ2qVCbjcRG46BgDTPgZP
+   eJy1k00OQEAMhecCFhaWLiSItTu4qXASa/GzoIkmTfOqg3jJCx7Tr0yF8F75h7Wzc3+9YbSnC5CjLEbMyE6nwnS9qee+mBmJcAb6KSMz6z1SYLR+iqhpMUZgrQ1krPY69qrP/mIskQxSY+S1YMhvzgypJ7OM5uQPhp4TtK9UU869x+jEOao3AFuzTKocHtpDi8Gqgy3irSp7w2DtTv+sp/+5pwPptDVF
   </data>
  </layer>
- <layer name="collision" width="25" height="14">
+ <layer name="collision" width="25" height="14" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBh6IBCKsYkPRkCqu2jht8EWNtR0Dy6zBpufKQWD0Z+0sBufmaSGAbXcR23zAZgWBgQ=
   </data>
  </layer>
- <layer name="player_collision" width="25" height="14">
+ <layer name="player_collision" width="25" height="14" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUjIJRQE8AAAV4AAE=
   </data>
  </layer>
- <objectgroup name="objects" width="25" height="14">
-  <object type="WARP_UP" x="556" y="151" width="44" height="46">
-   <properties>
-    <property name="target" value="1.json"/>
-   </properties>
-  </object>
- </objectgroup>
 </map>

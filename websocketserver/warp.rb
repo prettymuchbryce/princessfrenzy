@@ -4,7 +4,7 @@ class Warp
 	WARP_RIGHT = "WARP_RIGHT"
 	WARP_DOWN = "WARP_DOWN"
 	WARP = "WARP"
-	attr_accessor :x, :y, :level,:type
+	attr_accessor :x, :y, :level, :type
 	def initialize(x,y,level,type)
 		@x = x;
 		@y = y
