@@ -148,17 +148,19 @@ $("#username").keyup(function(event){
 });
 
 function sendMoveUpdate(direction) {
-	Connection.send("M" + DELIMITER + direction);
-
+	self = getSelf();
+	
 	if (direction === DIRECTION_UP) {
-		getSelf().move(DIRECTION_UP,getSelf().x,getSelf().y-1);
+		self.move(DIRECTION_UP,self.x,self.y-1);
 	} else if (direction === DIRECTION_LEFT) {
-		getSelf().move(DIRECTION_LEFT,getSelf().x-1,getSelf().y);
+		self.move(DIRECTION_LEFT,self.x-1,self.y);
 	} else if (direction === DIRECTION_DOWN) {
-		getSelf().move(DIRECTION_DOWN,getSelf().x,getSelf().y+1);
+		self.move(DIRECTION_DOWN,self.x,self.y+1);
 	} else if (direction === DIRECTION_RIGHT) {
-		getSelf().move(DIRECTION_RIGHT,getSelf().x+1,getSelf().y);
+		self.move(DIRECTION_RIGHT,self.x+1,self.y);
 	}
+
+	Connection.send("M" + DELIMITER + direction);
 }
 
 function sendShootArrow() {

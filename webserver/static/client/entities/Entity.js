@@ -59,7 +59,7 @@ Entity.prototype = {
 		objectLayer.removeChild(this.asset);
 	},
 	move: function(dir,x,y) {
-		if (this.x===x && this.y ===y && this.dir === dir) {
+		if (this.x === x && this.y === y && this.dir === dir) {
 			return;
 		}
 		if (x == -1 && y == -1) {
