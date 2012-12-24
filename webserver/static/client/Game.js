@@ -80,6 +80,7 @@ function loadLevel(path) {
 	}).done(function(payload) {
 	  destroyArrows();
 	  parseLayers(payload.layers);
+	  parseCollision(payload.layers);
 	  startRender();
 	});
 }
