@@ -134,7 +134,7 @@ function parseCollision(layers) {
 		for (var j = 0; j < layer.data.length; j++) {
 			if (layer.data[j]!==0) {
 				collision[y][x] = 1;
-			else {
+			} else {
 				collision[y][x] = 0;
 			}
 			x++;
