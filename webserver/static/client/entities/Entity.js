@@ -59,8 +59,10 @@ Entity.prototype = {
 		objectLayer.removeChild(this.asset);
 	},
 	move: function(dir,x,y) {
-		console.log("Move " + dir + " " + x + " " + y);
 		if (this.x === x && this.y === y && this.dir === dir) {
+			return;
+		}
+		if (collision[y][x]==1) {
 			return;
 		}
 		if (x == -1 && y == -1) {

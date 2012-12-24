@@ -18,6 +18,7 @@ var stage;
 var canvas;
 var canvasBg;
 var contextBg;
+var collision;
 var tileLayer = new createjs.Container();
 var objectLayer = new createjs.Container();
 
@@ -42,6 +43,13 @@ $(document).ready(function() {
 	// To change where assets are loaded from, change ASSET_URL here
 	// ASSET_URL = "http://place/";
 	initAssets(ASSET_URL);
+
+
+	//Initialize Collision Data
+	collision = [];
+	for (var y = 0; y < MAP_HEIGHT; y++) {
+		collision.push([]);
+	}
 	
 	stage.addChild(tileLayer);
 	stage.addChild(objectLayer);
@@ -52,9 +60,11 @@ $(document).ready(function() {
 		$(".modalContainer").css("display","block");
 	},400);
 });
+
 function startRender() {
 	createjs.Ticker.addListener(onTick);
 }
+
 function stopRender() {
 	createjs.Ticker.removeListener(onTick);
 }
@@ -103,6 +113,29 @@ function parseLayers(layers) {
 			var point = getTileById(layer.data[j]);
 			if (point.x >= 0 && point.y >= 0) {
 				contextBg.drawImage(ASSET_TILES,point.x*TILE_SIZE, point.y*TILE_SIZE,TILE_SIZE,TILE_SIZE,x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
+			}
+			x++;
+			if (x === MAP_WIDTH) {
+				x = 0;
+				y++;
+			}
+		}
+	}
+}
+
+function parseCollision(layers) {
+	for (var i = 0; i < layers.length; i++) {
+		var layer = layers[i];
+		if (layer.name !== "collision" && layer.name !== "playercollision") {
+			continue;
+		}
+		var x = 0;
+		var y = 0;
+		for (var j = 0; j < layer.data.length; j++) {
+			if (layer.data[j]!==0) {
+				collision[y][x] = 1;
+			else {
+				collision[y][x] = 0;
 			}
 			x++;
 			if (x === MAP_WIDTH) {
