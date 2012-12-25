@@ -80,7 +80,7 @@ class NPC
 
 	private
 	def is_point_valid_move?(x,y)
-		if x > 0 && y > 0 && x < Game::MAP_WIDTH && y < Game::MAP_HEIGHT && @level.collision[y][x] == 0
+		if x >= 0 && y >= 0 && x < Game::MAP_WIDTH && y < Game::MAP_HEIGHT && @level.collision[y][x] == 0
 			return true
 		else
 			return false
