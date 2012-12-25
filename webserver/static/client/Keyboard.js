@@ -58,5 +58,18 @@ Keyboard.onKeyUp = function(event) {
 }
 
 //Event Listeners
+
+$("#chatBox").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#chatButton").click();
+    }
+});
+
+$("#username").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#loginButton").click();
+    }
+});
+
 window.addEventListener('keydown',Keyboard.onKeyDown);
 window.addEventListener('keyup',Keyboard.onKeyUp);

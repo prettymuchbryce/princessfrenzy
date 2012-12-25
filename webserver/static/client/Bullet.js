@@ -1,11 +1,12 @@
 //Main Classes
-var Arrow = function(id,direction,x,y,level) {
+var Bullet = function(id,direction,x,y,level) {
 	this.id = id;
 	this.x = x;
 	this.y = y;
+	this.classType = CLASS_BULLET;
 	this.direction = direction;
 	this.level = level;
-	this.asset = new createjs.Bitmap(ASSET_ARROW);
+	this.asset = new createjs.Bitmap(ASSET_BULLET);
 	this.asset.sourceRect = {x: 0, y:0, width: TILE_SIZE, height:TILE_SIZE};
 	stage.addChild(this.asset);
 	this.asset.x = this.x*TILE_SIZE;
@@ -22,17 +23,17 @@ var Arrow = function(id,direction,x,y,level) {
 
 	this.destroy = function() {
 		stage.removeChild(this.asset);
+		for (var i = 0; i < entities.length; i++) {
+			if (entities[i] === this) {
+				entities.splice(i,1);
+				return;
+			}
+		}
 	}
 
 	this.move = function (dir,x,y) {
 		if (isNaN(x) || isNaN(y) || x < 0 || y < 0 || x === MAP_WIDTH || y === MAP_HEIGHT) {
-			for (var i = 0; i < arrows.length; i++) {
-				if (arrows[i] === this) {
-					arrows[i].destroy();
-					arrows.splice(i,1);
-					return;
-				}
-			}
+			this.destroy();
 		}
 		this.x = x;
 		this.y = y;

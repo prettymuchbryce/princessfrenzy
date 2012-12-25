@@ -1,11 +1,12 @@
 var Player = function(id,name,dir,x,y) {
-	Entity.call(this,ASSET_PLAYER,x,y,dir,id,id);
+	Entity.call(this,ASSET_PLAYER,x,y,dir,id,name);
 
-	this.chatField = new createjs.Text()
+	this.classType = CLASS_PLAYER;
 
-	this.chatField.textAlign = "center"
+	this.chatField = new createjs.Text();
+	this.chatField.textAlign = "center";
 	this.chatField.x = 15;
-	this.chatField.color = "#FFFFFF"
+	this.chatField.color = "#FFFFFF";
 	this.chatField.y = -14;
 	this.asset.addChild(this.chatField);
 

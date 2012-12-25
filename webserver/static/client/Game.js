@@ -1,4 +1,5 @@
-//Constants should always be declared at the top of a file. Not within the code.
+// Constants are declared at the top of the file,
+// If you don't do it then you're in denial.
 
 //Game Constants
 var DIRECTION_UP = 0;
@@ -12,27 +13,30 @@ var MAP_HEIGHT = CANVAS_HEIGHT/TILE_SIZE;
 var MAP_WIDTH = CANVAS_WIDTH/TILE_SIZE;
 var TILE_SHEET_WIDTH = 16;
 var TILE_SHEET_HEIGHT = 16;
+var CLASS_BULLET = "BULLET";
+var CLASS_ENTITY = "ENTITY";
+var CLASS_PLAYER = "PLAYER";
 
 //HTML5, and Framework globals.
 var stage;
+var entities = [];
 var canvas;
 var canvasBg;
 var contextBg;
 var collision;
 var tileLayer = new createjs.Container();
 var objectLayer = new createjs.Container();
-
-var muted = true;
-var id;
-var self = undefined;
-var dead = false;
-var arrows = [];
-var players = [];
-var explosions = [];
-var server_texts = [];
-var princess = null;
 var requestParams = [];
 var levelPath = "";
+var muted = true;
+
+//Client vars
+var self = undefined;
+var dead = false;
+
+//Effects
+var explosions = [];
+var server_texts = [];
 
 $(document).ready(function() {
 	canvas = document.getElementById("canvas");
@@ -43,7 +47,6 @@ $(document).ready(function() {
 	// To change where assets are loaded from, change ASSET_URL here
 	// ASSET_URL = "http://place/";
 	initAssets(ASSET_URL);
-
 
 	//Initialize Collision Data
 	collision = [];
@@ -78,19 +81,19 @@ function loadLevel(path) {
 	  crossDomain: true,
 	  dataType: 'json'
 	}).done(function(payload) {
-	  destroyArrows();
+	  destroyBullets();
 	  parseLayers(payload.layers);
 	  parseCollision(payload.layers);
 	  startRender();
 	});
 }
 
-function destroyArrows() {
-	for(var i = 0; i < arrows.length; i++) {
-		arrows[i].destroy();
+function destroyBullets() {
+	for(var i = 0; i < entities.length; i++) {
+		if (entities[i].classType === CLASS_BULLET) {
+			entities[i].destroy();
+		}
 	}
-	
-	arrows.length = 0;
 }
 
 function getTileById(id) {
@@ -149,52 +152,52 @@ function parseCollision(layers) {
 
 function getSelf() {
 	if (self===undefined) {
-		self = getPlayerById(id);
+		self = getEntityById(selfId);
 	}
 	return self;
 }
 
-function getPlayerById(id) {
-	for (var i = 0; i < players.length; i++) {
-		if (players[i].id === id) {
-			return players[i];
+function getEntityById(id) {
+	for (var i = 0; i < entities.length; i++) {
+		if (entities[i].id === String(id)) {
+			return entities[i];
 		}
 	}
 	return null;
 }
 
-function getArrowById(id) {
-	for (var i =0; i < arrows.length; i++) {
-		if (arrows[i].id === id) {
-			return arrows[i];
-		}
-	}
-	return null;
-}
-
-function doesPlayerExist(id) {
-	for (var i = 0; i < players.length; i++) {
-		if (players[i].id === id) {
+function doesEntityExist(id) {
+	for (var i = 0; i < entities.length; i++) {
+		if (entities[i].id === String(id)) {
 			return true;
 		}
 	}
 	return false;
 }
 
-function doesArrowExist(id) {
-	for (var i = 0; i < arrows.length; i++) {
-		if (arrows[i].id === id) {
-			return true;
-		}
-	}
-	return false;	
+function createNpc(id,name,asset,dir,x,y) {
+	npc = new Entity(asset,x,y,dir,id,name);
+	entities.push(npc);
+	return npc;
 }
 
-function deletePlayer(id) {
-	for (var i =0; i < players.length; i++) {
-		if (players[i].id === id) {
-			players[i].destroy();
-			players.splice(i,1);
+function createPlayer(id,name,dir,x,y) {
+	player = new Player(id,name,dir,x,y);
+	entities.push(player);
+	return player;
+}
+
+function createBullet(id,dir,x,y,level) {
+	bullet = new Bullet(id,dir,x,y,level);
+	entities.push(bullet);
+	return bullet;
+}
+
+function deleteEntity(id) {
+	for (var i =0; i < entities.length; i++) {
+		if (entities[i].id === id) {
+			entities[i].destroy();
+			entities.splice(i,1);
 		}
 	}
 }
@@ -206,17 +209,6 @@ function killPlayer(d) {
 			players[i].die();
 		}
 	}
-}
-
-function createPlayer(id,name, dir, x,y) {
-	p = new Player(id,name,dir,x,y);
-	players.push(p);
-	return p;
-}
-
-function createArrow(id,dir,x,y,level) {
-	a = new Arrow(id,dir,x,y,level);
-	arrows.push(a);
 }
 
 var moveCounter = 0;
@@ -232,7 +224,7 @@ function onTick() {
 		return;
 	}
 	
-	// We dont want to overflow these, so lets stop once they reach the limit
+	// We dont want to overflow these, so lets stop once they reach the limit.
 	if(moveCounter <= moveTime)
 		moveCounter++;
 	if(arrowCounter <= arrowTime)

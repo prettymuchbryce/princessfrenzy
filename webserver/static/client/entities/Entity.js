@@ -8,14 +8,17 @@ var Entity = function(asset,x,y,dir,id,name) {
 	this.dir = dir;
 
 	/* id used for server/client communication */
-	this.id = id;
+	this.id = String(id);
 
+	/* Class type */
+	this.classType = CLASS_ENTITY;
+	
 	/* Visible name */
 	this.name = name;
 
 	/* Tile-based position */
-	this.x = x;
-	this.y = y;
+	this.x = parseInt(x);
+	this.y = parseInt(y);
 
 	/* A container for this Entity's sprite, and it's text elements */
 	this.asset = new createjs.Container();
@@ -28,7 +31,7 @@ var Entity = function(asset,x,y,dir,id,name) {
 	this.asset.addChild(nameTextField);
 
 	/* The bitmap representing this Entity's sprite */
-	this.bitmap = new createjs.Bitmap(ASSET_PLAYER);
+	this.bitmap = new createjs.Bitmap(asset);
 
 	/* Set sprite to the first frame */
 	this.bitmap.sourceRect = {x: this.dir*TILE_SIZE, y: 0, width: TILE_SIZE, height: TILE_SIZE};
@@ -57,22 +60,21 @@ Entity.prototype = {
 	},
 	destroy: function() {
 		objectLayer.removeChild(this.asset);
+		for (var i =0; i < entities.length; i++) {
+			if (entities[i] === this) {
+				entities.splice(i,1);
+			}
+		}
 	},
 	move: function(dir,x,y) {
 		if (this.x === x && this.y === y && this.dir === dir) {
 			return;
 		}
-		if (collision[y][x]==1) {
+		if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
 			return;
 		}
-		if (x == -1 && y == -1) {
-			for (var i = 0; i < players.length; i++) {
-				if (players[i] === this) {
-					players[i].destroy();
-					players.splice(i,1);
-					return;
-				}
-			}
+		if (collision[y][x]===1) {
+			return;
 		}
 		this.x = x;
 		this.y = y;

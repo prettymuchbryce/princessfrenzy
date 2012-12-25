@@ -1,23 +1,33 @@
 require 'json'
 require_relative 'warp'
 require_relative 'game'
+require_relative 'npc'
+require_relative 'helpers'
 class Level
-    attr_accessor :users, :bullets, :collision, :player_collision, :warps, :spawn, :file
+    attr_accessor :users, :bullets, :collision, :player_collision, :warps, :spawn, :file, :npcs
     @levels = Hash.new
     class << self
         attr_accessor :levels
     end
-    def initialize(file)
+    def initialize(game,file)
         @file = file
+        @game = game
         @users = []
+        @npcs = []
         @bullets = []
         @spawn = {}
         rows, cols = Game::MAP_WIDTH,Game::MAP_HEIGHT
         @collision = Array.new(rows) { Array.new(cols) }
 		@player_collision = Array.new(rows) { Array.new(cols) }
         @warps = []
-        level = JSON.parse(File.read('../webserver/static/levels/'+file))
+        load_level_data('../webserver/static/levels/'+file)
 
+        point = find_noncollidable_space()
+        @npcs.push(NPC.new(point["x"],point["y"],"npc",Helpers.get_id(game),self,"oldman.png"))
+    end
+
+    def load_level_data(path_to_json)
+        level = JSON.parse(File.read(path_to_json))
         Level.levels[file] = self
 
         #Parse Level Data
@@ -33,22 +43,23 @@ class Level
                         y +=1
                     end
                 end
-			elsif layer["name"] == "player_collision"
-				x = 0
-				y = 0
-				layer["data"].each do |tile|
-					@player_collision[y][x] = tile
-					x+=1
-					if x == Game::MAP_WIDTH
-						x = 0
-						y +=1
-					end
-				end
+            elsif layer["name"] == "player_collision"
+                x = 0
+                y = 0
+                layer["data"].each do |tile|
+                    @player_collision[y][x] = tile
+                    x+=1
+                    if x == Game::MAP_WIDTH
+                        x = 0
+                        y +=1
+                    end
+                end
             elsif layer["name"] == "objects"
                 layer["objects"].each do |object|
                     if object["type"] == Warp::WARP || object["type"] == Warp::WARP_DOWN || object["type"] == Warp::WARP_UP || object["type"] == Warp::WARP_LEFT || object["type"] == Warp::WARP_RIGHT
                         if !Level.levels[object["properties"]["target"]]
-                            level = Level.new(object["properties"]["target"])
+                            level = Level.new(@game,object["properties"]["target"])
+                            @game.levels.push(level)
                         else
                             level = Level.levels[object["properties"]["target"]]
                         end
@@ -62,6 +73,7 @@ class Level
             end
         end
     end
+
     def find_noncollidable_space
         candidates = []
         for y in 0..Game::MAP_HEIGHT
@@ -85,7 +97,6 @@ class Level
                 end
             end
         end
-
         return candidates.sample
     end
 end

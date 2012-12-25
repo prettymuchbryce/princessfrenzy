@@ -1,12 +1,13 @@
+require_relative 'helpers'
 class User
-	attr_accessor :x, :ws, :y, :id, :dir, :is_admin, :ip, :dead, :last_action, :level, :wins, :next_move, :next_bullet, :spawn_protection
-	def initialize(id,ws,dir,x,y,is_admin,ip)
-		@wins = 0
-		@id = id
+	attr_accessor :x, :ws, :y, :id, :dir, :is_admin, :ip, :dead, :last_action, :level, :next_move, :next_bullet, :spawn_protection, :name
+	def initialize(id,name,ws,dir,x,y,is_admin,ip)
+		@id = id.to_s
+		@name = name
 		@level = nil
 		@ip = ip
 		@ws = ws;
-		@dead = false;
+		@dead = false
 		@x = x
 		@y = y
 		@is_admin = is_admin

@@ -9,24 +9,28 @@ require_relative 'user.rb'
 require_relative 'helpers.rb'
 
 def add_user_to_level(x, y, game,user,level)
-    send_level_message(game, user.ws, level.file)
+    Messaging.send_level_message(game, user.ws, level.file)
 
     user.x = x
     user.y = y
 
     level.users.each do |user_already_in_level|
-      send_move_message(game,user.ws,user_already_in_level) #Tell this person about all the players
+      Messaging.send_move_message(game,user.ws,user_already_in_level) #Tell this person about all the players
+    end
+
+    level.npcs.each do |npc|
+      Messaging.send_npc_move_message(game,user.ws,npc)
     end
 
     level.users.push(user)
     user.level = level
 
     level.users.each do |user_already_in_level|
-      send_move_message(game,user_already_in_level.ws,user) #Tell each player about this new person
+      Messaging.send_move_message(game,user_already_in_level.ws,user) #Tell each player about this new person
     end
 
     level.bullets.each do |bullet|
-      send_bullet_message(game, user.ws, bullet)
+      Messaging.send_bullet_message(game, user.ws, bullet)
     end
 end
 
@@ -37,19 +41,23 @@ def remove_user_from_game(game,user)
 end
 
 def remove_user_from_level(game,user,level)
-  level.users.delete(user)
-
   user.x = -1
   user.y = -1
   
   #Tell all users that this guy is out of here..
   level.users.each do |user_already_in_level|
-    send_move_message(game,user_already_in_level.ws,user)
+    Messaging.send_move_message(game,user_already_in_level.ws,user)
   end
 
-  #Tell this users to delete display objects of old users
+  level.users.delete(user)
+
+  level.npcs.each do |npc|
+    Messaging.send_specific_npc_move_message(game,user.ws,npc,-1,-1)
+  end
+
+  #Tell this user to delete display objects of users in the level
    level.users.each do |user_already_in_level|
-    send_specific_move_message(game,user.ws,user_already_in_level,-1,-1)
+    Messaging.send_specific_move_message(game,user.ws,user_already_in_level,-1,-1)
   end
 end
 
@@ -59,7 +67,7 @@ def handle_chat(user,ws,params,game)
   end
   puts user.id.to_s + " : " + params[1]
   game.sockets.each do |ws|
-    send_chat_message(game,ws,user.id.to_s,params[1])
+    Messaging.send_chat_message(game,ws,user.id.to_s,params[1])
   end
 end
 
@@ -75,18 +83,12 @@ def handle_login(ws,params,game)
 
   user_name = params[1]
   password = params[2] #Not used yet
-  
-  if !does_user_exist?(user_name,game)
-    ws.send Game::OK_RESPONSE
+  port, ip = Socket.unpack_sockaddr_in(ws.get_peername)
+  user = User.new(Helpers.get_id(game),user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
+  game.users.push(user)
+  Messaging.send_accept_login_message(game,ws,user)
 
-    port, ip = Socket.unpack_sockaddr_in(ws.get_peername)
-
-    user = User.new(user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
-
-    game.users.push(user)
-
-    add_user_to_level(4,4,game,user,game.levels[0][0])
-  end
+  add_user_to_level(4,4,game,user,game.levels[0])
 end
 
 def handle_move(user,ws,params,game)
@@ -162,7 +164,7 @@ def handle_move(user,ws,params,game)
   end
 
   user.level.users.each do |user_in_level|
-    send_move_message(game,user_in_level.ws,user)
+    Messaging.send_move_message(game,user_in_level.ws,user)
   end
 end
 
@@ -197,44 +199,41 @@ def handle_bullet(user,ws,params,game)
   else
     return
   end
-  bullet = Bullet.new(game.bullet_ids.to_s, user.dir, x, y, user.level, user.id)
-  game.bullet_ids+=1
+  bullet = Bullet.new(Helpers.get_id(game), user.dir, x, y, user.level, user.id)
   game.bullets.push(bullet)
 
   bullet.level.users.each do |user|
-    send_bullet_message(game, user.ws, bullet)
+    Messaging.send_bullet_message(game, user.ws, bullet)
   end
 end
 
 def parse_message(ws,msg,game)
-  params = msg.split(Game::DELIMITER)
-
-	if msg[0] == Game::LOGIN
+  params = msg.split(Messaging::DELIMITER)
+  puts params
+	if msg[0] == Messaging::LOGIN
     handle_login(ws,params,game)
     return
   end
 
-  user = get_user_from_ws(game,ws)
+  user = Helpers.get_user_from_ws(game,ws)
 
   if user == nil
     return
   end
 
-  if is_user_banned?(game,user)
-    send_banned_message(game, ws)
+  if Helpers.is_user_banned?(game,user)
+    Messaging.send_banned_message(game, ws)
     return
   end
 
   user.last_action = Time.now
 
-	if msg[0] == Game::MOVE
+	if msg[0] == Messaging::MOVE
     handle_move(user,ws,params,game)
-  elsif msg[0] == Game::BULLET
+  elsif msg[0] == Messaging::BULLET
     handle_bullet(user,ws,params,game)
-  elsif msg[0] == Game::CHAT
+  elsif msg[0] == Messaging::CHAT
     handle_chat(user,ws,params,game)
-  elsif msg[0] == "V"
-    #die("Goodbye")
   end
 end
 
@@ -251,6 +250,16 @@ EventMachine.run {
         end
       end
     end
+    EM.add_periodic_timer(2) do
+      game.levels.each do |level|
+        level.npcs.each do |npc|
+          npc.update()
+          level.users.each do |user|
+            Messaging.send_npc_move_message(game,user.ws,npc)
+          end
+        end
+      end
+    end
     EM.add_periodic_timer(0.05) do
       game.bullets.each do |bullet|
 
@@ -261,7 +270,7 @@ EventMachine.run {
           end
 
           if bullet.owner != user.id && user.x == bullet.x && user.y == bullet.y && user.dead == false && bullet.level == user.level
-            send_server_message_message(game, user.ws, "You will be revived in 20 seconds.")
+            Messaging.send_server_message_message(game, user.ws, "You will be revived in 20 seconds.")
             user.dead = true
             game.sockets.each do |ws|
 
@@ -272,16 +281,16 @@ EventMachine.run {
               timer = EventMachine::Timer.new(20) do
                 if user!=nil
                   user.dead = false
-				  user.spawn_protection = Time.now + 1
+				          user.spawn_protection = Time.now + 1
                 end
               end
-              send_die_message(game, ws, user)
+              Messaging.send_die_message(game, ws, user)
             end
           end
         end
 
         bullet.level.users.each do |user|
-          send_bullet_message(game, user.ws, bullet)
+          Messaging.send_bullet_message(game, user.ws, bullet)
         end
 
 		
@@ -324,8 +333,7 @@ EventMachine.run {
 
           #Inform players he left
           game.sockets.each do |socket|
-            send_chat_message(game, socket, "THE SERVER SAYS", id.to_s + " has left.")
-            socket.send Game::QUIT + Game::DELIMITER + id
+            Messaging.send_quit_message(game,socket,id)
           end
         }
 
