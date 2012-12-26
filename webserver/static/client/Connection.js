@@ -70,13 +70,13 @@ function sendMoveUpdate(direction) {
 	self = getSelf();
 
 	if (direction === DIRECTION_UP) {
-		//self.move(DIRECTION_UP,self.x,self.y-1);
+		self.move(DIRECTION_UP,self.x,self.y-1);
 	} else if (direction === DIRECTION_LEFT) {
-		//self.move(DIRECTION_LEFT,self.x-1,self.y);
+		self.move(DIRECTION_LEFT,self.x-1,self.y);
 	} else if (direction === DIRECTION_DOWN) {
-		//self.move(DIRECTION_DOWN,self.x,1+self.y);
+		self.move(DIRECTION_DOWN,self.x,1+self.y);
 	} else if (direction === DIRECTION_RIGHT) {
-		//self.move(DIRECTION_RIGHT,self.x,self.y);
+		self.move(DIRECTION_RIGHT,self.x,self.y);
 	}
 
 	Connection.send("M" + Messaging.DELIMITER + direction);
