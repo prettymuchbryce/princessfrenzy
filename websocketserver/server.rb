@@ -87,8 +87,8 @@ def handle_login(ws,params,game)
   user = User.new(Helpers.get_id(game),user_name, ws, Game::DIRECTION_UP, 5, 5, false, ip)
   game.users.push(user)
   Messaging.send_accept_login_message(game,ws,user)
-
-  add_user_to_level(4,4,game,user,game.levels[0])
+  point = game.levels[0].find_noncollidable_space()
+  add_user_to_level(point["x"],point["y"],game,user,game.levels[0])
 end
 
 def handle_move(user,ws,params,game)
