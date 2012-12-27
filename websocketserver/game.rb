@@ -30,11 +30,46 @@ class Game
         @bullets = []
         @ids = 0
         @sockets = []
-        rows, cols = Game::WORLD_WIDTH,Game::WORLD_HEIGHT
         @levels = []
         @banned = JSON.parse(File.read('banned.json'))
         @princess_time = 60
 
-        @levels.push(Level.new(self,"1.json"))
+
+        rows, cols = 10,5
+        grid = Array.new(rows) { Array.new(cols) }
+        for y in 0..5
+            for x in 0..10
+                if rand(20) == 1
+                    level = Level.new(self,"1.json",false)
+                    @levels.push(level)
+                else
+                    level = Level.new(self,"",true)
+                    @levels.push(level)
+                end
+                grid[y][x] = level
+            end
+        end
+
+        for y in 0..5
+            for x in 0..10
+                hook_up(grid, x, y)
+            end
+        end
+
+    end
+
+    def hook_up(grid,x,y)
+        if y > 0
+            grid[y][x].add_warp(grid[y-1][x],Warp::WARP_UP)
+        end
+        if x > 0
+            grid[y][x].add_warp(grid[y][x-1],Warp::WARP_LEFT)
+        end
+        if x < grid[0].length
+            grid[y][x].add_warp(grid[y][x+1],Warp::WARP_RIGHT)
+        end
+        if y < grid.length
+            grid[y][x].add_warp(grid[y+1][x],Warp::WARP_DOWN)
+        end
     end
 end

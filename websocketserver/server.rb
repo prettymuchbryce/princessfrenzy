@@ -209,7 +209,6 @@ end
 
 def parse_message(ws,msg,game)
   params = msg.split(Messaging::DELIMITER)
-  puts params
 	if msg[0] == Messaging::LOGIN
     handle_login(ws,params,game)
     return

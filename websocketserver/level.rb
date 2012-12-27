@@ -13,7 +13,7 @@ class Level
     class << self
         attr_accessor :levels, :random_level_ids
     end
-    def initialize(game,file)
+    def initialize(game,file,random)
         @file = file
         @game = game
         @users = []
@@ -21,7 +21,9 @@ class Level
         @bullets = []
         @spawn = {}
 
-        randomize()
+        if random
+            randomize()
+        end
 
         rows, cols = Game::MAP_WIDTH,Game::MAP_HEIGHT
         @collision = Array.new(rows) { Array.new(cols) }
@@ -35,6 +37,7 @@ class Level
 
     def randomize()
         @file = "r" + Level.random_level_ids.to_s + ".json"
+        puts "Procedurally generating: " + @file
         Level.random_level_ids+=1
 
         @collision = []
@@ -101,6 +104,11 @@ class Level
         return point["y"]*16+point["x"]
     end
 
+    def add_warp(level,dir)
+        warp = Warp.new(0,0,level,dir)
+        @warps.push(warp)
+    end
+
     def load_level_data(path_to_json)
         level = JSON.parse(File.read(path_to_json))
         Level.levels[file] = self
@@ -131,19 +139,19 @@ class Level
                 end
             elsif layer["name"] == "objects"
                 layer["objects"].each do |object|
-                    if object["type"] == Warp::WARP || object["type"] == Warp::WARP_DOWN || object["type"] == Warp::WARP_UP || object["type"] == Warp::WARP_LEFT || object["type"] == Warp::WARP_RIGHT
-                        if !Level.levels[object["properties"]["target"]]
-                            level = Level.new(@game,object["properties"]["target"])
-                            @game.levels.push(level)
-                        else
-                            level = Level.levels[object["properties"]["target"]]
-                        end
-                        warp = Warp.new((object["x"]/Game::TILE_SIZE).floor,(object["y"]/Game::TILE_SIZE).floor,level,object["type"])
-                        @warps.push(warp)
-                    elsif object["type"] == "SPAWN"
-                        @spawn["x"] = (object["x"]/Game::TILE_SIZE).floor
-                        @spawn["y"] = (object["y"]/Game::TILE_SIZE).floor
-                    end
+                    #if object["type"] == Warp::WARP || object["type"] == Warp::WARP_DOWN || object["type"] == Warp::WARP_UP || object["type"] == Warp::WARP_LEFT || object["type"] == Warp::WARP_RIGHT
+                    #    if !Level.levels[object["properties"]["target"]]
+                    #        level = Level.new(@game,object["properties"]["target"])
+                    #        @game.levels.push(level)
+                    #    else
+                    #        level = Level.levels[object["properties"]["target"]]
+                    #    end
+                    #    warp = Warp.new((object["x"]/Game::TILE_SIZE).floor,(object["y"]/Game::TILE_SIZE).floor,level,object["type"])
+                    #    @warps.push(warp)
+                    #elsif object["type"] == "SPAWN"
+                    #    @spawn["x"] = (object["x"]/Game::TILE_SIZE).floor
+                    #    @spawn["y"] = (object["y"]/Game::TILE_SIZE).floor
+                    #end
                 end
             end
         end
