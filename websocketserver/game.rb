@@ -37,6 +37,8 @@ class Game
 
         rows, cols = 10,5
         grid = Array.new(rows) { Array.new(cols) }
+        puts rows
+        puts cols
         for y in 0..5
             for x in 0..10
                 if rand(20) == 1
@@ -65,10 +67,10 @@ class Game
         if x > 0
             grid[y][x].add_warp(grid[y][x-1],Warp::WARP_LEFT)
         end
-        if x < grid[0].length-1
+        if x < 9
             grid[y][x].add_warp(grid[y][x+1],Warp::WARP_RIGHT)
         end
-        if y < grid.length-1
+        if y < 4
             grid[y][x].add_warp(grid[y+1][x],Warp::WARP_DOWN)
         end
     end
