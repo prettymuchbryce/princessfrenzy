@@ -65,10 +65,10 @@ class Game
         if x > 0
             grid[y][x].add_warp(grid[y][x-1],Warp::WARP_LEFT)
         end
-        if x < grid[0].length
+        if x < grid[0].length-1
             grid[y][x].add_warp(grid[y][x+1],Warp::WARP_RIGHT)
         end
-        if y < grid.length
+        if y < grid.length-1
             grid[y][x].add_warp(grid[y+1][x],Warp::WARP_DOWN)
         end
     end
